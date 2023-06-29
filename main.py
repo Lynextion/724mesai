@@ -3,6 +3,7 @@ import requests
 from tenacity import retry,wait_random_exponential,stop_after_attempt
 from termcolor import colored
 import csv
+import sys
 
 
 GPT_MODEL = "gpt-3.5-turbo-0613"
@@ -34,25 +35,24 @@ def chat_completion_request(messages,functions=None,function_call=None,model=GPT
         print("Unable to generate ChatCompletion request")
         print(f"Exception: {e}")
         return e
+    
 
 
-def createFunction(topic):
+def createFunction():
 
     functions = [
         {
             "name":"Advisor",
-            "description":"Your Job is answer our questions",
+            "description":"You are a company helper. Workers gonna ask questions about their job",
             "parameters":{
                 "type":"object",
                 "properties":{
                     "advise":{
                         "type":"string",
                         "description":f"""
-                                    We are a company.
-                                    We gonna Ask you some technical problems and you will help us.
-                                    If you are not sure about something, do not assume ask us
-                                    This is you topic={topic} if this value is not 'None' consider this in you answers
-                                    You SHOULD CALL THIS FUNCTION EVERYTIME
+                                    We are a company
+                                    You are an adviser and helper for this company 
+                                    
                                 """
                     }
                 },
@@ -65,39 +65,28 @@ def createFunction(topic):
 
 
 
-def __main__(message):
-
-    with open ("./messages.json","r") as outfile:
-        data = json.load(outfile)
-  
-    
-    topic = data["topic"]
-
-    function = createFunction(topic)
-    
-    messages = []
-    messages.append({"role":"system","content":"You are an adviser. Give you answers as you are advisor"})
-
-    if data["messages"]:
-        messages.append(data["messages"])
-
-    messages.append({"role":"user","content":message})
-
-    chat_response = chat_completion_request(messages,function)
-    
-
-    assistant_message = chat_response.json()["choices"][0]["message"]
-    
-    newData = {
-        "user":data["user"],
-        "topic":data["topic"],
-        "messages":messages
-    }
 
 
-    data.update(newData)
+file_path = sys.argv[1]
 
-    with open("./messages.json","w") as outfile :
-        json.dumps(data)
+with open(file_path) as f:
+    data = json.load(f)
 
-    return data    
+messageInfo = data["messageInfo"]
+companyInfo = data["companyInfo"]
+userInfo = data["userInfo"]
+
+messages = messageInfo["message"]
+
+
+function = createFunction()
+respond = chat_completion_request(messages)
+assistantMessage = respond.json()["choices"][0]["message"]
+messages.append(assistantMessage)
+print(assistantMessage)
+with open ("./messages.json","w") as outfile:
+    data["message"] = messages
+    object = json.dumps(data)
+    outfile.write(object)
+
+

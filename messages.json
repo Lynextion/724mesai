@@ -1,6 +1,20 @@
 {
-    "user":"Ata",
-    "topic":"test",
-    "messages":[]
+    "userInfo":{
+        "userId":"1",
+        "userName":"ata",
+        "Role":"Developer",
+        "CompanyId":1
+    },
+    "messageInfo":{
+        "messageId":1,
+        "message":[{"role":"user","content":"hello"}],
+        "topic":"test",
+        "date":323424
+    },
+    "companyInfo":{
+        "companyName":"deneme",
+        "companyId":13,
+        "companydata": []
+    }
     
 }
