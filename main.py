@@ -38,21 +38,24 @@ def chat_completion_request(messages,functions=None,function_call=None,model=GPT
     
 
 
-def createFunction():
+def createFunction(companyInfo):
 
     functions = [
         {
             "name":"Advisor",
-            "description":"You are a company helper. Workers gonna ask questions about their job",
+            "description":f"""You are a company helper at {companyInfo["companyName"]}.The sector of this company is {companyInfo["sector"]} Workers gonna ask questions about their job""",
             "parameters":{
                 "type":"object",
                 "properties":{
                     "advise":{
                         "type":"string",
                         "description":f"""
-                                    We are a company
-                                    You are an adviser and helper for this company 
-                                    
+                                    We are a company at {companyInfo["companyName"]}.
+                                    The sector of this company {companyInfo["sector"]}.
+                                    The questions generally about this sector {companyInfo["sector"]} so anwer the questions acording to this.
+                                    You are an adviser and helper for this company
+                                    Advise people who ask you something 
+                                    call this function everytime
                                 """
                     }
                 },
@@ -67,23 +70,30 @@ def createFunction():
 
 
 
-file_path = sys.argv[1]
-
-with open(file_path) as f:
-    data = json.load(f)
+f = open("./messages.json")
+    
+data = json.loads(f.read())
+f.close()
 
 messageInfo = data["messageInfo"]
 companyInfo = data["companyInfo"]
 userInfo = data["userInfo"]
 
-messages = messageInfo["message"]
+messages = [{"role":"system","content":"The user name is "+userInfo["userName"]+". His/Her role in the company is "+userInfo["role"]+". So your answer must be accirding to these."}]
+
+for i in messageInfo["message"]:
+    messages.append(i)
 
 
-function = createFunction()
-respond = chat_completion_request(messages)
+
+function = createFunction(companyInfo)
+respond = chat_completion_request(messages,function)
 assistantMessage = respond.json()["choices"][0]["message"]
+
+
+
 messages.append(assistantMessage)
-print(assistantMessage)
+print(json.dumps(assistantMessage))
 with open ("./messages.json","w") as outfile:
     data["message"] = messages
     object = json.dumps(data)
