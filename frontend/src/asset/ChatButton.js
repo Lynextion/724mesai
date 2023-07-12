@@ -2,14 +2,16 @@ import './chatScreen.css'
 import chatSVG from "./svg/chat.svg"
 
 
-const ChatButton = ({topic}) =>{
-   
+const ChatButton = ({topic,handleClick}) =>{
+    
+    
    
     const ChatBT = () =>{
        const bt = topic.map((data) =>{
+        console.log("button mesaj id",data.messageId)
         return (
             <>
-            <button className="chatsBT"><img src={chatSVG} className="chatSVG" /><text className="topicText">{data}</text></button>
+            <button className="chatsBT" value={data.messageId} key={data.messageId} onClick={() => handleClick(data.messageId)}><img src={chatSVG} className="chatSVG" /><text className="topicText">{data.topic}</text></button>
             </>
         )
         })

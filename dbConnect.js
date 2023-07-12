@@ -14,7 +14,7 @@ async function run() {
 
 
 
-const createMessage = async (userId,userMessage) =>{
+const createMessage = async (userId,userMessage,id) =>{
     const client = new Client({
         cloud:{
             secureConnectBundle:"./secure-connect-724mesai.zip"
@@ -27,7 +27,7 @@ const createMessage = async (userId,userMessage) =>{
 
     const message = JSON.stringify(userMessage)
 
-    const id = uuidv4()
+    
 
     await client.connect()
 
@@ -75,9 +75,18 @@ async function updateMessages() {
       content: data.content
     };
     const objectString = JSON.stringify(object);
-    console.log(objectString);
-    await client.execute(`UPDATE companies.message SET messages = messages + ['${objectString}'] WHERE messageid = ${message.messageInfo.messageId}`);
+    console.log("hmm")
+    if(objectString.includes("'")){
+        console.log("bunlari kaldir")
+        const updated = objectString.replace(/'/g,"''")
+        await client.execute(`UPDATE companies.message SET messages = messages + ['${updated}'] WHERE messageid = ${message.messageInfo.messageId} ;`);
+    }
+
+    else{
+        console.log("tamam kaldırma be")
+        await client.execute(`UPDATE companies.message SET messages = messages + ['${objectString}'] WHERE messageid = ${message.messageInfo.messageId} ;`);
   }
+    }
 
   await client.shutdown()
 }
@@ -191,8 +200,9 @@ const addUser = async(userInfo) => {
     await client.connect()
 
     const id = uuidv4()
+   
 
-    await client.execute(`INSERT INTO companies.woker (userId,userName,role,companyId) VALUES (${id,userInfo.userName,userInfo.role,userInfo.companyId});`)
+    await client.execute(`INSERT INTO companies.woker (id,name,role,companyid) VALUES (${id},'${userInfo.userName}','${userInfo.role}',${userInfo.companyId});`)
 
     await client.shutdown()
 

@@ -9,15 +9,15 @@ const Messages = ({messages}) =>{
             if(data.role === "user"){
                 return (
                     <>
-                        <div className="userText"><text className="topicText">{data.content}</text></div>
+                        <div className="userText" key={data.messageId}><text className="topicText">User: {data.content}</text></div>
                     </>
                 )
             }
 
-            if(data.role === "system"){
+            if(data.role === "assistant"){
                 return(
                     <>
-                        <div className="systemText"><text className="topicText">{data.content}</text></div>
+                        <div className="systemText" key={data.messageId}><text className="topicText">Assistant: {data.content}</text></div>
                     </>
                 )
             }

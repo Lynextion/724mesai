@@ -91,8 +91,13 @@ respond = chat_completion_request(messages,function)
 assistantMessage = respond.json()["choices"][0]["message"]
 
 
+if(assistantMessage.get("function_call")):
+    value = eval(assistantMessage["function_call"]["arguments"])["advise"]
+    messages.append({"role":"assistant","content":"value"})
 
-messages.append(assistantMessage)
+else:
+    messages.append(assistantMessage)
+
 print(json.dumps(assistantMessage))
 with open ("./messages.json","w") as outfile:
     data["message"] = messages

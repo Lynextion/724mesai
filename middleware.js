@@ -20,17 +20,20 @@ app.get("/",(req,res) =>{
 
 
 app.post("/message", async (req,res) => {
-  const userId = req.body.userId
-  const userMessaage = req.body.message
 
-  const messageInfo = await db.receiveMessage(req.body.messageId)
+  console.log(req.body.body)
+
+  const userId = req.body.body.userId
+  const userMessaage = req.body.body.message
+
+  const messageInfo = await db.receiveMessage(req.body.body.messageId)
   const companyInfo = await db.findCompany(userId)
   const userInfo = await db.findUser(userId)
 
   const JSONmessage = messageInfo.messages.map((data) => {
     return JSON.parse(data)
   })
-
+  JSONmessage.push(userMessaage)
   console.log(JSONmessage)
 
   const messages = {
@@ -44,7 +47,7 @@ app.post("/message", async (req,res) => {
     },
 
     "messageInfo":{
-      "messageId":userMessaage.messageid,
+      "messageId":req.body.body.messageid,
       "message":JSONmessage,
       "topic":messageInfo.topic,
       "date":messageInfo.date
@@ -100,7 +103,7 @@ pythonProcess.stdout.on('data', (data) => {
     }
 
   }
-  
+  console.log("i call")
   db.addMessage(updatedMessages)
  
   
@@ -131,10 +134,11 @@ pythonProcess.on('error', (error) => {
 
 app.post("/create-message", async (req,res) =>{
 
-    const userId = req.body.userId
-    const userMessaage = req.body.message
+    const userId = req.body.body.userId
+    const userMessaage = req.body.body.message
+    const id = req.body.body.id
 
-    const messageInfo = await db.createMessage(userId,userMessaage)
+    const messageInfo = await db.createMessage(userId,userMessaage,id)
     const companyInfo = await db.findCompany(userId)
     const userInfo = await db.findUser(userId)
 
@@ -194,7 +198,7 @@ app.post("/create-message", async (req,res) =>{
   
       "messageInfo":{
         "messageId":messageInfo.messageid,
-        "message":[userMessaage,data],
+        "message":[data],
         "topic":messageInfo.topic,
         "date":messageInfo.date
         
@@ -302,6 +306,8 @@ app.post("/add-user", async (req,res) => {
 
   db.addUser(userInfo)
 
+  res.send(100)
+
 })
 
 app.post("/update-user", async(req,res) =>{
@@ -311,7 +317,7 @@ app.post("/update-user", async(req,res) =>{
       role:req.body.role,
       avatar:req.body.avatar
   }
-
+  console.log(userInfo)
   db.updateUser(userInfo)
 
 })
