@@ -136,9 +136,9 @@ app.post("/create-message", async (req,res) =>{
 
     const userId = req.body.body.userId
     const userMessaage = req.body.body.message
-    const id = req.body.body.id
+  
 
-    const messageInfo = await db.createMessage(userId,userMessaage,id)
+    const messageInfo = await db.createMessage(userId,userMessaage)
     const companyInfo = await db.findCompany(userId)
     const userInfo = await db.findUser(userId)
 

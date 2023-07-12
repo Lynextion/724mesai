@@ -7,10 +7,12 @@ import Add from "./svg/add.svg"
 import Messages from "./messages"
 import Commands from "./command"
 import { v4 as uuidv4 } from 'uuid';
-
+import React, {useRef} from "react"
 
 
 const ChatScreen = () =>{
+
+    const buttonRef = useRef(null)
 
     const messages = [{"role":"user","content":"hello"},{"role":"assistant","content":"hi Ata"},{"role":"user","content":"hello"}]
 
@@ -19,9 +21,10 @@ const ChatScreen = () =>{
     const [messageIds,setMessageIds] = useState([])
     const [messageInfo,setMessageInfo] = useState([{}])
     let [allMessage, setAllMessage] = useState([{}])
-    const [message,setMessage] = useState(messages)
+    const [message,setMessage] = useState([])
     const [currentMessageId,setCurrentMessageId] = useState()
     const [send,setSend] = useState()
+    const [newMessage,setNewMessage] = useState(false)
 
     const callTopics =  async ()  =>{
 
@@ -62,6 +65,7 @@ const ChatScreen = () =>{
         })
         
         setCurrentMessageId(e)
+        setNewMessage(false)
     }
     
 
@@ -84,30 +88,62 @@ const ChatScreen = () =>{
     }
 
     const createNewTopic= () =>{
-        const uuid = uuidv4()
+        setMessage([])
+        setNewMessage(true)
+        setCurrentMessageId('')
+
     }
 
    
 
-    const updateAllMessage =(id,data) =>{
+    const updateMessage =(data) =>{
         setMessage(prevState =>{
             return [...prevState,data]
         })
     }
 
     const sentMessage = async ()  =>{
-        const body = {
-            "userId": "05c8b932-ff4c-4842-b741-f56d580cf728",
-            "messageId":currentMessageId,
-            "message":{"role":"user","content":send}
-        }
-        console.log("body",body)
-        updateAllMessage(currentMessageId,body.message)
-        
 
-        await axios.post("http://localhost:4000/message",{body}).then((response) => {
-            updateAllMessage(currentMessageId,response.data)
-        })
+        if(newMessage === false){
+
+            const body = {
+                "userId": "05c8b932-ff4c-4842-b741-f56d580cf728",
+                "messageId":currentMessageId,
+                "message":{"role":"user","content":send}
+            }
+            console.log("body",body)
+            updateMessage(body.message)
+
+
+            await axios.post("http://localhost:4000/message",{body}).then((response) => {
+                updateMessage(response.data)
+            })
+        }
+
+        else{
+            const body = {
+                "userId": "05c8b932-ff4c-4842-b741-f56d580cf728",
+                "message":{"role":"user","content":send}
+            }
+            console.log("body",body)
+            updateMessage(body.message)
+
+
+            await axios.post("http://localhost:4000/create-message",{body}).then((response) => {
+                updateMessage(response.data)
+            })
+            callTopics()
+            setNewMessage(false)
+        }
+
+    }
+
+    const handleKeyDown = (event) => {
+        if(event.ctrlKey && event.key == 'Enter') {
+            event.preventDefault()
+            buttonRef.current.click()
+            console.log("yea")
+        }
     }
 
     return(
@@ -130,8 +166,8 @@ const ChatScreen = () =>{
                 <div className="command">
                     <Commands/>
                     <div className="textArea">
-                        <textarea className="commandEnter" value={send} onChange={textAreaOnChange}/>
-                        <button className="sendMessage" onClick={sentMessage}><text className="topicText">Gönder</text></button>
+                        <textarea className="commandEnter" placeholder="Try Me" onKeyDown={handleKeyDown} value={send} onChange={textAreaOnChange}/>
+                        <button className="sendMessage" ref={buttonRef} onClick={sentMessage}><text className="topicText">Gönder</text></button>
                     </div>
 
                 </div>

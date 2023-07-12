@@ -14,7 +14,7 @@ async function run() {
 
 
 
-const createMessage = async (userId,userMessage,id) =>{
+const createMessage = async (userId,userMessage) =>{
     const client = new Client({
         cloud:{
             secureConnectBundle:"./secure-connect-724mesai.zip"
@@ -27,7 +27,7 @@ const createMessage = async (userId,userMessage,id) =>{
 
     const message = JSON.stringify(userMessage)
 
-    
+    const id = uuidv4()
 
     await client.connect()
 
