@@ -19,6 +19,7 @@ app.get("/",(req,res) =>{
 })
 
 
+
 app.post("/message", async (req,res) => {
 
   console.log(req.body.body)
@@ -26,6 +27,7 @@ app.post("/message", async (req,res) => {
   const userId = req.body.body.userId
   const userMessaage = req.body.body.message
 
+  
   const messageInfo = await db.receiveMessage(req.body.body.messageId)
   const companyInfo = await db.findCompany(userId)
   const userInfo = await db.findUser(userId)
@@ -247,18 +249,24 @@ app.post("/all-message", async (req,res) => {
 
   const messageData = await db.allMessage(userId)
 
-  const data = messageData.map((data) =>{
-    return {
-      messageId : data.messageid,
-      companyId : data.companyid,
-      date : data.date,
-      messages: data.messages.map((object) => {return(JSON.parse(object))}),
-      topic : data.topic,
-      userid : data.userId
-    }
-  })
+  try {
+    const data = messageData.map((data) =>{
+      return {
+        messageId : data.messageid,
+        companyId : data.companyid,
+        date : data.date,
+        messages: data.messages.map((object) => {return(JSON.parse(object))}),
+        topic : data.topic,
+        userid : data.userId
+      }
+    })
 
-  res.send(data)
+    res.send(data)
+  }
+  catch(err){
+    res.send(err)
+    console.log(messageData)
+  }
 
 })
 
@@ -320,6 +328,14 @@ app.post("/update-user", async(req,res) =>{
   console.log(userInfo)
   db.updateUser(userInfo)
 
+})
+
+app.get("/delete-message/:id",async (req,res) =>{
+  const messageId = req.params.id
+  
+  await db.deleteMessage(messageId)
+
+  res.json({"status":"done"})
 })
 
 

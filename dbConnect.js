@@ -25,26 +25,34 @@ const createMessage = async (userId,userMessage) =>{
         },
     })
 
-    const message = JSON.stringify(userMessage)
+    try {
 
-    const id = uuidv4()
+        const message = JSON.stringify(userMessage)
 
-    await client.connect()
+        const id = uuidv4()
 
-    const userInfo = await client.execute(`SELECT * FROM companies.woker WHERE id =${userId};`)
-    const companyInfo = await client.execute(`SELECT * FROM companies.company WHERE workerid CONTAINS ${userId}`)
-    
-    const messageInfo = await client.execute(`INSERT INTO companies.message (messageId,companyId,date,messages,topic,userId) VALUES (${id},${companyInfo.first().id},toTimestamp(now()),['${message}'],'test',${userId});`)
-    .then(() =>{
-        return client.execute(`SELECT * FROM companies.message WHERE messageid = ${id}`)
-    })
-    .finally(() => {
-        client.shutdown()
-    })
+        await client.connect()
 
-    console.log(messageInfo.first())
+        const userInfo = await client.execute(`SELECT * FROM companies.woker WHERE id =${userId};`)
+        const companyInfo = await client.execute(`SELECT * FROM companies.company WHERE workerid CONTAINS ${userId}`)
+        
+        const messageInfo = await client.execute(`INSERT INTO companies.message (messageId,companyId,date,messages,topic,userId) VALUES (${id},${companyInfo.first().id},toTimestamp(now()),['${message}'],'test',${userId});`)
+        .then(() =>{
+            return client.execute(`SELECT * FROM companies.message WHERE messageid = ${id}`)
+        })
+        .finally(() => {
+            client.shutdown()
+        })
 
-    return messageInfo.first()
+        console.log(messageInfo.first())
+        return messageInfo.first()
+
+
+}
+
+catch(err) {
+    return err
+}
    
 
 }
@@ -61,39 +69,42 @@ const addMessage = async (message) =>{
         },
     })
 
+    try{
 
-    await client.connect()
+        await client.connect()
+        
+        const messages = message.messageInfo.message;
 
-    
-    
-    const messages = message.messageInfo.message;
+        async function updateMessages() {
+          for (const data of messages) {
+            const object = {
+              role: data.role,
+              content: data.content
+            };
+            const objectString = JSON.stringify(object);
+            console.log("hmm")
+            if(objectString.includes("'")){
+                console.log("bunlari kaldir")
+                const updated = objectString.replace(/'/g,"''")
+                await client.execute(`UPDATE companies.message SET messages = messages + ['${updated}'] WHERE messageid = ${message.messageInfo.messageId} ;`);
+            }
 
-async function updateMessages() {
-  for (const data of messages) {
-    const object = {
-      role: data.role,
-      content: data.content
-    };
-    const objectString = JSON.stringify(object);
-    console.log("hmm")
-    if(objectString.includes("'")){
-        console.log("bunlari kaldir")
-        const updated = objectString.replace(/'/g,"''")
-        await client.execute(`UPDATE companies.message SET messages = messages + ['${updated}'] WHERE messageid = ${message.messageInfo.messageId} ;`);
+            else{
+                console.log("tamam kaldırma be")
+                await client.execute(`UPDATE companies.message SET messages = messages + ['${objectString}'] WHERE messageid = ${message.messageInfo.messageId} ;`);
+          }
+            }
+
+          await client.shutdown()
+        }
+
+        // Call the function to update the messages
+        updateMessages();
     }
 
-    else{
-        console.log("tamam kaldırma be")
-        await client.execute(`UPDATE companies.message SET messages = messages + ['${objectString}'] WHERE messageid = ${message.messageInfo.messageId} ;`);
-  }
+    catch(err){
+        return err
     }
-
-  await client.shutdown()
-}
-
-// Call the function to update the messages
-updateMessages();
-  
 }
 
 const receiveMessage = async (message) =>{
@@ -107,16 +118,21 @@ const receiveMessage = async (message) =>{
         },
     })
 
+    try {
 
-    await client.connect()
+        await client.connect()
 
-   const getMessage = await client.execute(`SELECT * FROM companies.message WHERE messageid=${message};`)
+        const getMessage = await client.execute(`SELECT * FROM companies.message WHERE messageid=${message};`)
     
-   console.log(getMessage.first())
+        console.log(getMessage.first())
 
-    await client.shutdown()
+        await client.shutdown()
 
-    return getMessage.first()
+        return getMessage.first()
+    }
+    catch(err){
+        return err
+    }
 }
 
 const allMessage = async(userId) =>{
@@ -130,15 +146,20 @@ const allMessage = async(userId) =>{
         },
     })
 
+    try{
+        await client.connect()
 
-    await client.connect()
+        const messages = await client.execute(`SELECT * FROM companies.message WHERE userid=${userId}`)
+        console.log(messages.rows)
+        await client.shutdown()
 
-    const messages = await client.execute(`SELECT * FROM companies.message WHERE userid=${userId}`)
-    console.log(messages.rows)
-    await client.shutdown()
+        return messages.rows
 
-    return messages.rows
+    }
 
+    catch(err){
+        return err
+    }
 }
 
 
@@ -153,14 +174,18 @@ const findUser = async (userId) =>{
         },
     })
 
+    try{
+        await client.connect()
 
-    await client.connect()
+        const userInfo = await client.execute(`SELECT * FROM companies.woker WHERE id=${userId};`)
 
-    const userInfo = await client.execute(`SELECT * FROM companies.woker WHERE id=${userId};`)
+        await client.shutdown()
 
-    await client.shutdown()
-
-    return userInfo.first()
+        return userInfo.first()
+    }
+    catch(err){
+        return err
+    }
 }
 
 const findUsers = async (companyId) =>{
@@ -174,14 +199,18 @@ const findUsers = async (companyId) =>{
         },
     })
 
+    try{
+        await client.connect()
 
-    await client.connect()
+        const userInfo = await client.execute(`SELECT * FROM companies.woker WHERE companyid=${companyId};`)
 
-    const userInfo = await client.execute(`SELECT * FROM companies.woker WHERE companyid=${companyId};`)
+        await client.shutdown()
 
-    await client.shutdown()
-
-    return userInfo.first()
+        return userInfo.first()
+    }
+    catch(err){
+        return err
+    }
 }
 
 
@@ -196,16 +225,20 @@ const addUser = async(userInfo) => {
         },
     })
 
+    try{
 
-    await client.connect()
+        await client.connect()
 
-    const id = uuidv4()
-   
+        const id = uuidv4()
+        
 
-    await client.execute(`INSERT INTO companies.woker (id,name,role,companyid) VALUES (${id},'${userInfo.userName}','${userInfo.role}',${userInfo.companyId});`)
+        await client.execute(`INSERT INTO companies.woker (id,name,role,companyid) VALUES (${id},'${userInfo.userName}','${userInfo.role}',${userInfo.companyId});`)
 
-    await client.shutdown()
-
+        await client.shutdown()
+    }
+    catch(err){
+        return err
+    }
 }
 
 
@@ -220,14 +253,20 @@ const findCompany = async (userId) =>{
         },
     })
 
+    try{
 
-    await client.connect()
+        await client.connect()
 
-    const companyInfo = await client.execute(`SELECT * FROM companies.company WHERE workerid CONTAINS ${userId};`)
-    
-    await client.shutdown()
+        const companyInfo = await client.execute(`SELECT * FROM companies.company WHERE workerid CONTAINS ${userId};`)
+        
+        await client.shutdown()
 
-    return companyInfo.first()
+        return companyInfo.first()
+    }
+
+    catch(err){
+        return err
+    }
 }
 
 const updateCompany = async(companyInfo) =>{
@@ -258,13 +297,44 @@ const updateUser = async(userInfo) =>{
         },
     })
 
+    try{
 
-    await client.connect()
+        await client.connect()
 
-    await client.execute(`UPDATE companies.woker SET name=${userInfo.userName}, companyid=${userInfo.companyId},role=${userInfo.role}, avatar = ${userInfo.avatar} WHERE id=${userInfo.userId};`)
+        await client.execute(`UPDATE companies.woker SET name=${userInfo.userName}, companyid=${userInfo.companyId},role=${userInfo.role}, avatar = ${userInfo.avatar} WHERE id=${userInfo.userId};`)
 
-    await client.shutdown()
+        await client.shutdown()
+    }
+
+    catch(err){
+        return err
+    }
 }
 
+const deleteMessage = async(messageInfo) =>{
+    const client = new Client({
+        cloud:{
+            secureConnectBundle:"./secure-connect-724mesai.zip"
+        },
+        credentials:{
+            username:process.env.CLIENT_ID,
+            password:process.env.CLIENT_SECRET
+        },
+    })
 
-module.exports = {receiveMessage,addMessage,createMessage,findUser,findCompany,findUsers,addUser,updateUser,allMessage}
+    try{
+
+        await client.connect()
+
+        await client.execute(`DELETE FROM companies.message WHERE messageid=${messageInfo};`)
+
+        await client.shutdown()
+
+    }
+    catch(err){
+        return err
+    }
+}
+ 
+
+module.exports = {receiveMessage,addMessage,createMessage,findUser,findCompany,findUsers,addUser,updateUser,allMessage,deleteMessage}

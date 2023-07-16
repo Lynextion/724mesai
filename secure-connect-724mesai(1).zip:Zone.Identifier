@@ -1,0 +1,3 @@
+[ZoneTransfer]
+ZoneId=3
+HostUrl=https://datastax-cluster-config-prod.s3.us-east-2.amazonaws.com/d15ef534-b3d1-42f1-a858-98a552d72cda-1/secure-connect-724mesai.zip?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA2AIQRQ76S2JCB77W%2F20230716%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Date=20230716T164245Z&X-Amz-Expires=300&X-Amz-SignedHeaders=host&X-Amz-Signature=2af03addb354a53ac29bbbac66f4990a016c942d54a50cea62eac1a367a0e67e
