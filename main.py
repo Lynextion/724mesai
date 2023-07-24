@@ -68,40 +68,36 @@ def createFunction(companyInfo):
 
 
 
+if __name__ == "__main__":
 
+    f = sys.argv[1]
 
-f = open("./messages.json")
+    data = json.loads(f)
     
-data = json.loads(f.read())
-f.close()
+ 
 
-messageInfo = data["messageInfo"]
-companyInfo = data["companyInfo"]
-userInfo = data["userInfo"]
+    messageInfo = data["messageInfo"]
+    companyInfo = data["companyInfo"]
+    userInfo = data["userInfo"]
 
-messages = [{"role":"system","content":"The user name is "+userInfo["userName"]+". His/Her role in the company is "+userInfo["role"]+". So your answer must be accirding to these."}]
+    messages = [{"role":"system","content":"The user name is "+userInfo["userName"]+". His/Her role in the company is "+userInfo["role"]+". So your answer must be accirding to these."}]
 
-for i in messageInfo["message"]:
-    messages.append(i)
-
+    for i in messageInfo["message"]:
+        messages.append(i)
 
 
-function = createFunction(companyInfo)
-respond = chat_completion_request(messages,function)
-assistantMessage = respond.json()["choices"][0]["message"]
+
+    function = createFunction(companyInfo)
+    respond = chat_completion_request(messages,function)
+    assistantMessage = respond.json()["choices"][0]["message"]
 
 
-if(assistantMessage.get("function_call")):
-    value = eval(assistantMessage["function_call"]["arguments"])["advise"]
-    messages.append({"role":"assistant","content":"value"})
+    if(assistantMessage.get("function_call")):
+        value = eval(assistantMessage["function_call"]["arguments"])["advise"]
+        messages.append({"role":"assistant","content":"value"})
 
-else:
-    messages.append(assistantMessage)
+    else:
+        messages.append(assistantMessage)
 
-print(json.dumps(assistantMessage))
-with open ("./messages.json","w") as outfile:
-    data["message"] = messages
-    object = json.dumps(data)
-    outfile.write(object)
-
-
+    print(json.dumps(assistantMessage))
+   

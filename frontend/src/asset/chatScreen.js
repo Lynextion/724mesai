@@ -9,6 +9,9 @@ import Commands from "./command"
 import { v4 as uuidv4 } from 'uuid';
 import React, {useRef} from "react"
 import robotWait from "./svg/robotWait.gif"
+import {  signOut ,onAuthStateChanged} from "firebase/auth";
+import {auth} from '../firebase';
+import { useNavigate } from 'react-router-dom';
 
 
 
@@ -34,6 +37,26 @@ const ChatScreen = () =>{
     const[pageLoaded,setPageLoaded] = useState(false)
     const [showTopic,setShowTopic] = useState(true)
 
+
+    const navigate = useNavigate()
+
+    const checkSigned = () =>{
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+              // User is signed in, see docs for a list of available properties
+              // https://firebase.google.com/docs/reference/js/firebase.User
+              const uid = user.uid;
+              
+              console.log(uid)
+              
+            } else {
+              // User is signed out
+              // ...
+              console.log("user is logged out")
+              navigate('/')
+            }
+          });
+}
 
     const callTopics =  async ()  =>{
 
@@ -101,7 +124,9 @@ const ChatScreen = () =>{
     }
 
     useEffect(() =>{
+        checkSigned()
         callTopics()
+
         
     },[])
 
@@ -211,6 +236,15 @@ const ChatScreen = () =>{
         )
     }
 
+    const handleLogout = () => {               
+        signOut(auth).then(() => {
+        // Sign-out successful.
+            navigate("/");
+            console.log("Signed out successfully")
+        }).catch((error) => {
+        // An error happened.
+        });
+    }
     
 
     const page = () =>{
@@ -229,6 +263,7 @@ const ChatScreen = () =>{
                     {collected && renderTopics()}
                 </div>
                 )}
+                <button onClick={handleLogout}>Sign Out</button>
             </div>
             <div className="chat">
                 <div className="messageContainer">

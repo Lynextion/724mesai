@@ -4,6 +4,9 @@ const bodyParser = require("body-parser")
 const { spawn } = require('child_process');
 const fs = require("fs")
 const db = require("./dbConnect")
+const { execFile } = require('child_process');
+const path = require('path');
+
 
 const app = express()
 const port = 4000
@@ -64,22 +67,20 @@ app.post("/message", async (req,res) => {
 
   }
 
-  fs.writeFile("./messages.json",JSON.stringify(messages),err =>{
-    if(err && !messages)
-        console.log("err")
-  })
 
 
  //Python için arguments eklenecek
-  const pythonProcess = spawn("python3",["./main.py"])
+  
+  const pythonScriptPath = path.join("main.py")
 
   let result = ''; // Store the result from the Python script
 
 // Capture the output of the Python process
-pythonProcess.stdout.on('data', (data) => {
+execFile('python3', [pythonScriptPath, JSON.stringify(messages)],(error,stdout,stderr) => {
   // Append the received data to the result variable
-  result += data;
-  data = JSON.parse(result)
+  result += stdout;
+  console.log(result)
+  data = result
   const updatedMessages = {
     "userInfo":{
 
@@ -107,29 +108,11 @@ pythonProcess.stdout.on('data', (data) => {
   }
   console.log("i call")
   db.addMessage(updatedMessages)
- 
+  res.send(result); 
   
 });
 
 // Handle the completion of the Python process
-pythonProcess.on('close', (code) => {
-  if (code === 0) {
-    // Python script executed successfully
-
-
-    res.send(result); // Send the result back to the client
-  } else {
-    // Python script encountered an error
-    console.error(`Python process exited with code ${code}`);
-    res.status(500).send('Internal Server Error');
-  }
-});
-
-// Handle any errors that occur during the Python process
-pythonProcess.on('error', (error) => {
-  console.error(`Python process error: ${error.message}`);
-  res.status(500).send('Internal Server Error');
-});
 
 
 })
@@ -172,73 +155,51 @@ app.post("/create-message", async (req,res) =>{
 
    
 
-    fs.writeFile("./messages.json",JSON.stringify(messages),err =>{
-      if(err && !messages)
-          console.log("err")
-    })
+   
 
   
    //Python için arguments eklenecek
-    const pythonProcess = spawn("python3",["./main.py"])
+   const pythonScriptPath = path.join("main.py")
 
-    let result = ''; // Store the result from the Python script
-
-  // Capture the output of the Python process
-  pythonProcess.stdout.on('data', (data) => {
-    // Append the received data to the result variable
-    result += data;
-    data = JSON.parse(result)
-    const updatedMessages = {
-      "userInfo":{
-  
-        "userId":userId,
-        "userName":userInfo.name,
-        "role":userInfo.role,
-        "companyId":companyInfo.id
-  
-      },
-  
-      "messageInfo":{
-        "messageId":messageInfo.messageid,
-        "message":[data],
-        "topic":messageInfo.topic,
-        "date":messageInfo.date
-        
-      },
-  
-      "companyInfo":{
-        "companyName":companyInfo.name,
-        "companyId":companyInfo.id,
-        "sector":companyInfo.sector
-      }
-  
-    }
-    
-    db.addMessage(updatedMessages)
+   let result = ''; // Store the result from the Python script
+ 
+ // Capture the output of the Python process
+ execFile('python3', [pythonScriptPath, JSON.stringify(messages)],(error,stdout,stderr) => {
+   // Append the received data to the result variable
+   result += stdout;
+   data = result
+   const updatedMessages = {
+     "userInfo":{
+ 
+       "userId":userId,
+       "userName":userInfo.name,
+       "role":userInfo.role,
+       "companyId":companyInfo.id
+ 
+     },
+ 
+     "messageInfo":{
+       "messageId":messageInfo.messageid,
+       "message":[userMessaage,data],
+       "topic":messageInfo.topic,
+       "date":messageInfo.date
+       
+     },
+ 
+     "companyInfo":{
+       "companyName":companyInfo.name,
+       "companyId":companyInfo.id,
+       "sector":companyInfo.sector
+     }
+ 
+   }
+   console.log("i call")
+   db.addMessage(updatedMessages)
+   res.send(result); 
    
-    
-  });
+ });
 
   // Handle the completion of the Python process
-  pythonProcess.on('close', (code) => {
-    if (code === 0) {
-      // Python script executed successfully
-
-
-      res.send(result); // Send the result back to the client
-    } else {
-      // Python script encountered an error
-      console.error(`Python process exited with code ${code}`);
-      res.status(500).send('Internal Server Error');
-    }
-  });
-
-  // Handle any errors that occur during the Python process
-  pythonProcess.on('error', (error) => {
-    console.error(`Python process error: ${error.message}`);
-    res.status(500).send('Internal Server Error');
-  });
-
   
 })
 
@@ -309,7 +270,8 @@ app.post("/add-user", async (req,res) => {
   const userInfo = {
     userName:req.body.userName,
     companyId:req.body.companyId,
-    role:req.body.role
+    role:req.body.role,
+    firebaseId:req.body.firebaseId
   }
 
   db.addUser(userInfo)
@@ -336,6 +298,17 @@ app.get("/delete-message/:id",async (req,res) =>{
   await db.deleteMessage(messageId)
 
   res.json({"status":"done"})
+})
+
+app.post("/insert-whitelist" ,async (req,res) =>{
+
+  const data = req.body.body
+
+
+  await db.insertWhiteList(data)
+
+  res.json({"status":"done"})
+  
 })
 
 

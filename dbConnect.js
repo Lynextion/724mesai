@@ -232,7 +232,7 @@ const addUser = async(userInfo) => {
         const id = uuidv4()
         
 
-        await client.execute(`INSERT INTO companies.woker (id,name,role,companyid) VALUES (${id},'${userInfo.userName}','${userInfo.role}',${userInfo.companyId});`)
+        await client.execute(`INSERT INTO companies.woker (id,name,role,companyid,firebaseId) VALUES (${id},'${userInfo.userName}','${userInfo.role}',${userInfo.companyId},${userInfo.firebaseId});`)
 
         await client.shutdown()
     }
@@ -335,6 +335,26 @@ const deleteMessage = async(messageInfo) =>{
         return err
     }
 }
+
+
+const insertWhiteList = async(data) =>{
+    const client = new Client({
+        cloud:{
+            secureConnectBundle:"./secure-connect-724mesai.zip"
+        },
+        credentials:{
+            username:process.env.CLIENT_ID,
+            password:process.env.CLIENT_SECRET
+        },
+    })
+
+    
+    await client.connect()
+    await client.execute(`UPDATE companies.company SET whitelist_email= whitelist_email + ['${data.email}'] WHERE id=${data.id}`)
+    await client.shutdown() 
+
+   
+}
  
 
-module.exports = {receiveMessage,addMessage,createMessage,findUser,findCompany,findUsers,addUser,updateUser,allMessage,deleteMessage}
+module.exports = {receiveMessage,addMessage,createMessage,findUser,findCompany,findUsers,addUser,updateUser,allMessage,deleteMessage,insertWhiteList}
