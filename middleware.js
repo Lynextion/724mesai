@@ -312,6 +312,29 @@ app.post("/insert-whitelist" ,async (req,res) =>{
 })
 
 
+app.post("/user",async (req,res) => {
+  const data = req.body.body.userId
+
+  res.send(await db.findUser(data))
+
+
+})
+
+app.post("/insertId",async(req,res) => {
+  const data = req.body.body
+
+  await db.addFirebaseId(data)
+
+  res.send("done")
+})
+
+app.post("/fİndUserwithEmail",async(req,res) =>{
+  const data = req.body.body
+
+  res.send(await db.findUserwithEmail(data))
+})
+
+
 app.listen(port, () => {
     console.log(`App listening on port ${port}`)
 })
