@@ -39,7 +39,7 @@ app.post("/message", async (req,res) => {
     return JSON.parse(data)
   })
   JSONmessage.push(userMessaage)
-  console.log(JSONmessage)
+  console.log("json message  ",JSONmessage)
 
   const messages = {
     "userInfo":{
@@ -78,8 +78,14 @@ app.post("/message", async (req,res) => {
 // Capture the output of the Python process
 execFile('python3', [pythonScriptPath, JSON.stringify(messages)],(error,stdout,stderr) => {
   // Append the received data to the result variable
+
+  if(error){
+    console.log(error)
+    return
+  }
+
   result += stdout;
-  console.log(result)
+  console.log("resil;t",result)
   data = result
   const updatedMessages = {
     "userInfo":{
@@ -93,7 +99,7 @@ execFile('python3', [pythonScriptPath, JSON.stringify(messages)],(error,stdout,s
 
     "messageInfo":{
       "messageId":messageInfo.messageid,
-      "message":[userMessaage,data],
+      "message":[userMessaage,JSON.parse(data)],
       "topic":messageInfo.topic,
       "date":messageInfo.date
       
@@ -167,6 +173,7 @@ app.post("/create-message", async (req,res) =>{
  execFile('python3', [pythonScriptPath, JSON.stringify(messages)],(error,stdout,stderr) => {
    // Append the received data to the result variable
    result += stdout;
+   console.log("stdd ",result)
    data = result
    const updatedMessages = {
      "userInfo":{
@@ -180,7 +187,7 @@ app.post("/create-message", async (req,res) =>{
  
      "messageInfo":{
        "messageId":messageInfo.messageid,
-       "message":[userMessaage,data],
+       "message":[JSON.parse(result)],
        "topic":messageInfo.topic,
        "date":messageInfo.date
        
@@ -193,7 +200,7 @@ app.post("/create-message", async (req,res) =>{
      }
  
    }
-   console.log("i call")
+   console.log("i call",updatedMessages)
    db.addMessage(updatedMessages)
    res.send(result); 
    
@@ -205,12 +212,13 @@ app.post("/create-message", async (req,res) =>{
 
 app.post("/all-message", async (req,res) => {
   
-  console.log(req)
+  console.log("reqqq" ,req)
   const userId = req.body.data.userId
 
   const messageData = await db.allMessage(userId)
+  
 
-  try {
+  
     const data = messageData.map((data) =>{
       return {
         messageId : data.messageid,
@@ -221,13 +229,10 @@ app.post("/all-message", async (req,res) => {
         userid : data.userId
       }
     })
-
+    console.log("adataaa ",data)
     res.send(data)
-  }
-  catch(err){
-    res.send(err)
-    console.log(messageData)
-  }
+  
+  
 
 })
 
@@ -332,6 +337,15 @@ app.post("/fİndUserwithEmail",async(req,res) =>{
   const data = req.body.body
 
   res.send(await db.findUserwithEmail(data))
+})
+
+app.post("/findUserwithUID", async (req,res) => {
+  const uid = req.body.body.uid
+
+  const user = await db.findUserUID(uid)
+
+  res.json(user)
+
 })
 
 

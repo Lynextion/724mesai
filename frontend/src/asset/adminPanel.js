@@ -4,6 +4,7 @@ import { useRef } from "react"
 import { generatePassword } from "./generate password"
 import { createUserWithEmailAndPassword } from "firebase/auth"
 import {auth} from "../firebase"
+import axios from "axios"
 
 const AdminPanel = () =>{
 
@@ -15,7 +16,13 @@ const AdminPanel = () =>{
     const userRol = useRef(null)
     const email = useRef(null)
 
-    
+    const addWhiteList = (email) =>{
+        const data = {
+            email:email
+        }
+        axios.post("http://localhost:4000/insert-whitelist")
+    }
+
     
     const userSumbit= () =>{
         const Email = email.current.value

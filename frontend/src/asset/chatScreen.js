@@ -20,7 +20,7 @@ const ChatScreen = () =>{
     const buttonRef = useRef(null)
     const bottomScroll = useRef(null)
 
-    const messages = [{"role":"user","content":"hello"},{"role":"assistant","content":"hi Ata"},{"role":"user","content":"hello"}]
+   
 
     const [topics,setTopics] = useState([''])
     const [collected,setCollected] = useState(false)
@@ -36,7 +36,11 @@ const ChatScreen = () =>{
     const [disabled,setDisabled] = useState(false)
     const[pageLoaded,setPageLoaded] = useState(false)
     const [showTopic,setShowTopic] = useState(true)
-
+    
+    const tempInfo = JSON.parse(localStorage.getItem("userData"))
+    const userInfo = tempInfo[0]
+    const tempuserId = userInfo.id
+    const [userId,setUserId] = useState(tempuserId)
 
     const navigate = useNavigate()
 
@@ -45,9 +49,15 @@ const ChatScreen = () =>{
             if (user) {
               // User is signed in, see docs for a list of available properties
               // https://firebase.google.com/docs/reference/js/firebase.User
-              const uid = user.uid;
+              const User = user
               
-              console.log(uid)
+              if(!localStorage.getItem("userFirebaseData")){
+                localStorage.setItem("userFirebaseData",User)
+              }
+
+             
+              console.log("userInfo ", userId)
+              callTopics()
               
             } else {
               // User is signed out
@@ -63,7 +73,8 @@ const ChatScreen = () =>{
         try{
 
         
-            const data = {"userId": "05c8b932-ff4c-4842-b741-f56d580cf728"}
+            const data = {"userId": userId}
+            console.log(data)
             axios.post("http://localhost:4000/all-message",{data}).then((response) => {scrapTopics(response.data)})
         }
         catch(err){
@@ -125,7 +136,7 @@ const ChatScreen = () =>{
 
     useEffect(() =>{
         checkSigned()
-        callTopics()
+
 
         
     },[])
@@ -160,7 +171,7 @@ const ChatScreen = () =>{
                 setActivate(false)
                 setDisabled(true)
                 const body = {
-                    "userId": "05c8b932-ff4c-4842-b741-f56d580cf728",
+                    "userId": userId,
                     "messageId":currentMessageId,
                     "message":{"role":"user","content":send}
                 }
@@ -179,8 +190,9 @@ const ChatScreen = () =>{
                 setActivate(false)
                 setDisabled(true)
                 setDisabled('')
+                console.log("191 ",userId)
                 const body = {
-                    "userId": "05c8b932-ff4c-4842-b741-f56d580cf728",
+                    "userId": userId,
                     "message":{"role":"user","content":send}
                 }
                 console.log("body",body)
@@ -240,6 +252,8 @@ const ChatScreen = () =>{
         signOut(auth).then(() => {
         // Sign-out successful.
             navigate("/");
+            localStorage.removeItem("userData")
+            localStorage.removeItem("userFirebaseData")
             console.log("Signed out successfully")
         }).catch((error) => {
         // An error happened.

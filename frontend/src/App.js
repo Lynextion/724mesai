@@ -3,6 +3,7 @@ import './App.css';
 import ChatScreen from "./asset/chatScreen"
 import Firebase from "./firebase"
 import LoginScreen from "./asset/loginScreen"
+import RegisterScreen from "./asset/registerScreen"
 import Panel from "./asset/adminPanel"
 import { useEffect } from 'react';
 import {BrowserRouter, Routes, Route} from "react-router-dom";

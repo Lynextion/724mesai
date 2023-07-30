@@ -11,19 +11,21 @@ async function run() {
 
 }
 
+const client = new Client({
+    cloud:{
+        secureConnectBundle:"./secure-connect-724mesai.zip"
+    },
+    credentials:{
+        username:process.env.CLIENT_ID,
+        password:process.env.CLIENT_SECRET
+    },
+})
 
+
+client.connect()
 
 
 const createMessage = async (userId,userMessage) =>{
-    const client = new Client({
-        cloud:{
-            secureConnectBundle:"./secure-connect-724mesai.zip"
-        },
-        credentials:{
-            username:process.env.CLIENT_ID,
-            password:process.env.CLIENT_SECRET
-        },
-    })
 
     try {
 
@@ -31,7 +33,6 @@ const createMessage = async (userId,userMessage) =>{
 
         const id = uuidv4()
 
-        await client.connect()
 
         const userInfo = await client.execute(`SELECT * FROM companies.woker WHERE id =${userId};`)
         const companyInfo = await client.execute(`SELECT * FROM companies.company WHERE workerid CONTAINS ${userId}`)
@@ -40,9 +41,7 @@ const createMessage = async (userId,userMessage) =>{
         .then(() =>{
             return client.execute(`SELECT * FROM companies.message WHERE messageid = ${id}`)
         })
-        .finally(() => {
-            client.shutdown()
-        })
+        
 
         console.log(messageInfo.first())
         return messageInfo.first()
@@ -59,19 +58,11 @@ catch(err) {
 
 
 const addMessage = async (message) =>{
-    const client = new Client({
-        cloud:{
-            secureConnectBundle:"./secure-connect-724mesai.zip"
-        },
-        credentials:{
-            username:process.env.CLIENT_ID,
-            password:process.env.CLIENT_SECRET
-        },
-    })
+  
 
     try{
 
-        await client.connect()
+      
         
         const messages = message.messageInfo.message;
 
@@ -82,7 +73,7 @@ const addMessage = async (message) =>{
               content: data.content
             };
             const objectString = JSON.stringify(object);
-            console.log("hmm")
+            console.log("hmm  ",objectString)
             if(objectString.includes("'")){
                 console.log("bunlari kaldir")
                 const updated = objectString.replace(/'/g,"''")
@@ -95,7 +86,6 @@ const addMessage = async (message) =>{
           }
             }
 
-          await client.shutdown()
         }
 
         // Call the function to update the messages
@@ -108,25 +98,14 @@ const addMessage = async (message) =>{
 }
 
 const receiveMessage = async (message) =>{
-    const client = new Client({
-        cloud:{
-            secureConnectBundle:"./secure-connect-724mesai.zip"
-        },
-        credentials:{
-            username:process.env.CLIENT_ID,
-            password:process.env.CLIENT_SECRET
-        },
-    })
+   
 
     try {
 
-        await client.connect()
 
         const getMessage = await client.execute(`SELECT * FROM companies.message WHERE messageid=${message};`)
     
-        console.log(getMessage.first())
-
-        await client.shutdown()
+        console.log("get message func ",getMessage.first())
 
         return getMessage.first()
     }
@@ -136,23 +115,13 @@ const receiveMessage = async (message) =>{
 }
 
 const allMessage = async(userId) =>{
-    const client = new Client({
-        cloud:{
-            secureConnectBundle:"./secure-connect-724mesai.zip"
-        },
-        credentials:{
-            username:process.env.CLIENT_ID,
-            password:process.env.CLIENT_SECRET
-        },
-    })
 
     try{
-        await client.connect()
+    
 
         const messages = await client.execute(`SELECT * FROM companies.message WHERE userid=${userId}`)
-        console.log(messages.rows)
-        await client.shutdown()
-
+       
+    
         return messages.rows
 
     }
@@ -164,22 +133,14 @@ const allMessage = async(userId) =>{
 
 
 const findUser = async (userId) =>{
-    const client = new Client({
-        cloud:{
-            secureConnectBundle:"./secure-connect-724mesai.zip"
-        },
-        credentials:{
-            username:process.env.CLIENT_ID,
-            password:process.env.CLIENT_SECRET
-        },
-    })
+    
 
     try{
-        await client.connect()
+   
 
         const userInfo = await client.execute(`SELECT * FROM companies.woker WHERE id=${userId};`)
 
-        await client.shutdown()
+   
 
         return userInfo.first()
     }
@@ -189,22 +150,13 @@ const findUser = async (userId) =>{
 }
 
 const findUsers = async (companyId) =>{
-    const client = new Client({
-        cloud:{
-            secureConnectBundle:"./secure-connect-724mesai.zip"
-        },
-        credentials:{
-            username:process.env.CLIENT_ID,
-            password:process.env.CLIENT_SECRET
-        },
-    })
+    
 
     try{
-        await client.connect()
+    
 
         const userInfo = await client.execute(`SELECT * FROM companies.woker WHERE companyid=${companyId};`)
 
-        await client.shutdown()
 
         return userInfo.first()
     }
@@ -215,51 +167,54 @@ const findUsers = async (companyId) =>{
 
 
 const addUser = async(userInfo) => {
-    const client = new Client({
-        cloud:{
-            secureConnectBundle:"./secure-connect-724mesai.zip"
-        },
-        credentials:{
-            username:process.env.CLIENT_ID,
-            password:process.env.CLIENT_SECRET
-        },
-    })
+    
 
     try{
 
-        await client.connect()
+        
 
         const id = uuidv4()
         
 
-        await client.execute(`INSERT INTO companies.woker (id,name,role,companyid,firebaseId) VALUES (${id},'${userInfo.userName}','${userInfo.role}',${userInfo.companyId},${userInfo.firebaseId});`)
+        await client.execute(`INSERT INTO companies.woker (id,name,role,companyid) VALUES (${id},'${userInfo.userName}','${userInfo.role}',${userInfo.companyId});`)
 
-        await client.shutdown()
+    
     }
     catch(err){
         return err
     }
 }
 
+const addFirebaseId = async(userInfo) =>{
+    
+
+    try{
+      
+        await client.execute(`UPDATE companies.woker SET firebaseId=${userInfo} WHERE email='${userInfo.email}';`)
+
+      
+    }
+
+    catch(err){
+        console.log(err)
+    }
+}
+
+const findUserwithEmail = async (userInfo) =>{
+   
+    await client.execute(`SELECT * FROM companies.woker WHERE email='${userInfo.email}';`)
+}
 
 const findCompany = async (userId) =>{
-    const client = new Client({
-        cloud:{
-            secureConnectBundle:"./secure-connect-724mesai.zip"
-        },
-        credentials:{
-            username:process.env.CLIENT_ID,
-            password:process.env.CLIENT_SECRET
-        },
-    })
+   
 
     try{
 
-        await client.connect()
+
 
         const companyInfo = await client.execute(`SELECT * FROM companies.company WHERE workerid CONTAINS ${userId};`)
         
-        await client.shutdown()
+       
 
         return companyInfo.first()
     }
@@ -270,40 +225,20 @@ const findCompany = async (userId) =>{
 }
 
 const updateCompany = async(companyInfo) =>{
-    const client = new Client({
-        cloud:{
-            secureConnectBundle:"./secure-connect-724mesai.zip"
-        },
-        credentials:{
-            username:process.env.CLIENT_ID,
-            password:process.env.CLIENT_SECRET
-        },
-    })
-
-
-    await client.connect()
+    
 
     await client.execute(`UPDATE companies.company SET name`)
 }
 
 const updateUser = async(userInfo) =>{
-    const client = new Client({
-        cloud:{
-            secureConnectBundle:"./secure-connect-724mesai.zip"
-        },
-        credentials:{
-            username:process.env.CLIENT_ID,
-            password:process.env.CLIENT_SECRET
-        },
-    })
+    
 
     try{
 
-        await client.connect()
+       
 
-        await client.execute(`UPDATE companies.woker SET name=${userInfo.userName}, companyid=${userInfo.companyId},role=${userInfo.role}, avatar = ${userInfo.avatar} WHERE id=${userInfo.userId};`)
+        await client.execute(`UPDATE companies.woker SET name=${userInfo.userName}, companyid=${userInfo.companyId},role=${userInfo.role}  WHERE id=${userInfo.userId};`)
 
-        await client.shutdown()
     }
 
     catch(err){
@@ -312,23 +247,14 @@ const updateUser = async(userInfo) =>{
 }
 
 const deleteMessage = async(messageInfo) =>{
-    const client = new Client({
-        cloud:{
-            secureConnectBundle:"./secure-connect-724mesai.zip"
-        },
-        credentials:{
-            username:process.env.CLIENT_ID,
-            password:process.env.CLIENT_SECRET
-        },
-    })
-
+    
     try{
 
-        await client.connect()
+        
 
         await client.execute(`DELETE FROM companies.message WHERE messageid=${messageInfo};`)
 
-        await client.shutdown()
+        
 
     }
     catch(err){
@@ -338,23 +264,21 @@ const deleteMessage = async(messageInfo) =>{
 
 
 const insertWhiteList = async(data) =>{
-    const client = new Client({
-        cloud:{
-            secureConnectBundle:"./secure-connect-724mesai.zip"
-        },
-        credentials:{
-            username:process.env.CLIENT_ID,
-            password:process.env.CLIENT_SECRET
-        },
-    })
-
     
-    await client.connect()
+    
+ 
     await client.execute(`UPDATE companies.company SET whitelist_email= whitelist_email + ['${data.email}'] WHERE id=${data.id}`)
-    await client.shutdown() 
+    
 
    
 }
+
+const findUserUID = async(uid) => {
+    const user = await client.execute(`SELECT * FROM companies.woker WHERE uid='${uid}';`)
+
+    return user.rows
+}
+
  
 
-module.exports = {receiveMessage,addMessage,createMessage,findUser,findCompany,findUsers,addUser,updateUser,allMessage,deleteMessage,insertWhiteList}
+module.exports = {receiveMessage,addMessage,createMessage,findUser,findCompany,findUsers,addUser,updateUser,allMessage,deleteMessage,insertWhiteList,addFirebaseId,findUserwithEmail,findUserUID}

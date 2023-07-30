@@ -39,7 +39,7 @@ const ChatButton = ({topic,handleClick,deleteChat}) =>{
 
 
       const result = {
-        Today: [],
+        'Today': [],
         'Previous 1 Day': [],
         'Previous 7 Days': [],
         'Previous 30 Days': [],
@@ -52,7 +52,7 @@ const ChatButton = ({topic,handleClick,deleteChat}) =>{
         const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     
         if (diffDays === 0) {
-          result.Today.push(obj);
+          result['Today'].push(obj);
         } else if (diffDays <= 1) {
           result['Previous 1 Day'].push(obj);
         } else if (diffDays <= 7) {
@@ -66,12 +66,28 @@ const ChatButton = ({topic,handleClick,deleteChat}) =>{
       console.log(sortedTopic());
     
     const sortedItems = sortedTopic()
+    console.log("sorted",sortedItems)
    
     const ChatBT = () =>{
         const bt = []
+
+        if(sortedItems['Today'].length !== 0){
+          bt.push(<span className='sortName'>Today</span>)
+         bt.push(sortedItems['Today'].map((data,key) =>{
+              return(
+                  <>
+                  <div className="chatsBTdiv">
+                      <button className="chatBT" value={data.messageId} key={data.messageId} onClick={() => handleClick(data.messageId)}><img src={chatSVG} className="chatSVG" /><text className="topicText">{data.topic}</text></button>
+                      <button className="deleteChat" onClick={() => deleteChat(data.messageId)} ><img src={deleteSVG}/></button>
+                  </div>
+                  </>
+              )
+          }))
+      }
+
         if(sortedItems['Previous 1 Day'].length !== 0){
             bt.push(<span className='sortName'>Previous 1 Day</span>)
-           bt.push(sortedItems.Today.map((data,key) =>{
+           bt.push(sortedItems['Previous 1 Day'].map((data,key) =>{
                 return(
                     <>
                     <div className="chatsBTdiv">
@@ -97,7 +113,7 @@ const ChatButton = ({topic,handleClick,deleteChat}) =>{
             }))
         }
 
-        if(sortedItems['Previous 30 Days'.length !== 0]){
+        if(sortedItems['Previous 30 Days'].length !== 0){
             bt.push(<span className='sortName'>Previous 30 Days</span>)
             bt.push(sortedItems['Previous 30 Days'].map((data,key) =>{
                 return(
@@ -108,7 +124,7 @@ const ChatButton = ({topic,handleClick,deleteChat}) =>{
                 )
             }))
         }
-
+        console.log("btdir bu",bt)
         return bt
     }
 

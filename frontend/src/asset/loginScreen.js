@@ -6,6 +6,7 @@ import logo from "./svg/altin-logo-w-1.png"
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword,onAuthStateChanged } from "firebase/auth"
 import {auth} from "../firebase"
 import { useNavigate } from "react-router-dom"
+import axios from "axios"
 
 const LoginScreen = () =>{
 
@@ -41,10 +42,10 @@ const LoginScreen = () =>{
     }
 
     const forwardTips = () => {
-        const length = tipCounter.length
-
-        if (tipCounter == length){
-            setTipCounter(0)
+        
+        if (tipCounter === tips.length - 1){
+            
+            setTipCounter(() => {return 0})
         }
 
         else{
@@ -54,14 +55,25 @@ const LoginScreen = () =>{
         }
     }
 
+    const previousTips = () => {
+        if(tipCounter - 1 < 0){
+            setTipCounter(() => {return tips.length - 1})
+        }
+
+        else{
+            setTipCounter((previous) => {return previous -1 })
+        }
+    }
+
     const checkSigned = () =>{
         onAuthStateChanged(auth, (user) => {
             if (user) {
               // User is signed in, see docs for a list of available properties
               // https://firebase.google.com/docs/reference/js/firebase.User
-              const uid = user.uid;
+              const data = user
+              getUser(data.uid)
+              localStorage.setItem("userFirebaseData",JSON.stringify(data))
               
-              navigate("/chat")
               
             } else {
               // User is signed out
@@ -78,15 +90,34 @@ const LoginScreen = () =>{
         await signInWithEmailAndPassword(auth,Email,Password)
         .then((userCredential) =>{
             const user = userCredential.user
+            saveLocalStorage(user)
             console.log(user)
-        }).then(() => checkSigned())
+            return user.uid
+        })
+        .then( (uid) =>{
+                getUser(uid)
+        })
+        .then(() => checkSigned())
 
 
+    }
+
+    const getUser = async (uid) =>{
+        const body = {"uid":uid}
+        axios.post("http://localhost:4000/findUserwithUID",{body})
+        .then((response) => {
+            console.log("user response ",response.data)
+            localStorage.setItem("userData",JSON.stringify(response.data))
+        }).then(() =>{navigate("/chat")})
     }
 
     useEffect(() =>{
         checkSigned()
     },[])
+
+    const saveLocalStorage = async (data) => {
+        localStorage.setItem("userFirebaseData",JSON.stringify(data))
+    }
   
 
     return(
@@ -101,7 +132,7 @@ const LoginScreen = () =>{
                 </div>
             </div>
             <div className="infoSide">
-               <button className="sliderBT"> <img src={left}/> </button>
+               <button className="sliderBT" onClick={previousTips}> <img src={left}/> </button>
                 {showTips()}
                <button className="sliderBT" onClick={forwardTips}> <img src={right}/> </button>
             </div>
