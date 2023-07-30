@@ -6,11 +6,15 @@ import right from "./svg/right.svg"
 import {auth} from "../firebase"
 import { createUserWithEmailAndPassword, getAuth } from "firebase/auth"
 import { useNavigate } from "react-router-dom"
+import axios from "axios"
 
 const RegisterScreen = () => {
 
     const email = useRef(null)
     const password = useRef(null)
+    const tempPassword =useRef(null)
+
+   
 
     const tips = [{
         title : "Kelime sayısı konusunda net olun.",
@@ -73,10 +77,34 @@ const RegisterScreen = () => {
             })
     }
 
+    const getWhitelist = () =>{
+        const temp = localStorage.getItem("userData")
+        const jsonValue = JSON.parse(temp)
+
+        const body = {
+            "id":jsonValue[0].companyid
+        }
+
+       const whitelist = axios.post("http//localhost:4000",{body})
+        .then((response) => {
+           return response.data
+        })
+
+        return whitelist
+    }
+
     const submit = () =>{
         const Email = email.current.value
         const Password = password.current.value
-        registerUser(Email,Password)
+        const whitelist = getWhitelist()
+
+        if(Email in whitelist){
+            registerUser(Email,Password)
+        }
+
+        else{
+            console.log("hirsizz varrr")
+        }
     }
 
     return(
