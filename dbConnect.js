@@ -279,6 +279,10 @@ const findUserUID = async(uid) => {
     return user.rows
 }
 
- 
+const getWhitelist = async (id) =>{
+    const list = await client.execute(`SELECT whitelist_email FROM companies.company WHERE id=${id}`)
 
-module.exports = {receiveMessage,addMessage,createMessage,findUser,findCompany,findUsers,addUser,updateUser,allMessage,deleteMessage,insertWhiteList,addFirebaseId,findUserwithEmail,findUserUID}
+    return list.first()
+}
+
+module.exports = {receiveMessage,addMessage,createMessage,findUser,findCompany,findUsers,addUser,updateUser,allMessage,deleteMessage,insertWhiteList,addFirebaseId,findUserwithEmail,findUserUID,getWhitelist}

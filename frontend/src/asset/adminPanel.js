@@ -1,10 +1,11 @@
 import "./adminPanel.css"
 import Logo from "./svg/altin-logo-w-1.png"
-import { useRef } from "react"
+import { useRef, useState } from "react"
 import { generatePassword } from "./generate password"
 import { createUserWithEmailAndPassword } from "firebase/auth"
 import {auth} from "../firebase"
 import axios from "axios"
+import robotWait from "./svg/robotWait.gif"
 
 const AdminPanel = () =>{
 
@@ -15,17 +16,43 @@ const AdminPanel = () =>{
     const userName = useRef(null)
     const userRol = useRef(null)
     const email = useRef(null)
+    
 
-    const addWhiteList = (email) =>{
-        const data = {
-            email:email
+    const [wait,setWait] = useState(false)
+
+    const addWhiteList = (email,id) =>{
+        const body = {
+            "email":email,
+            "id":id
         }
-        axios.post("http://localhost:4000/insert-whitelist")
+        axios.post("http://localhost:4000/insert-whitelist",{body})
+        .then(() =>{
+            setWait(false)
+        })
     }
 
-    
+    const userAddBT = () =>{
+        return(
+            <>
+                 <button className="addUserBT" onClick={userSumbit}><p className="btP">Kişi Ekle</p></button>
+            </>
+        )
+    }
+
+    const waitBT = () =>{
+        return(
+            <>
+                <img className="robot" src={robotWait}/>
+            </>
+        )
+    }
+
     const userSumbit= () =>{
         const Email = email.current.value
+        const temp = JSON.parse(localStorage.getItem("userData"))
+        console.log(temp[0])
+        setWait(true)
+        addWhiteList(Email,temp[0].companyid)
         
     }
 
@@ -46,7 +73,8 @@ const AdminPanel = () =>{
                     <input className="input" ref={userName} placeholder="İsim Soyisim"/>
                     <input className="input" ref={userRol} placeholder="Rolü"/>
                     <input className="input" ref={email} placeholder="Mail Adresi"/>
-                    <button className="addUserBT" onClick={userSumbit}><p className="btP">Kişi Ekle</p></button>
+                    {!wait && userAddBT()}
+                    {wait && waitBT()}
                 </div>
             </div>
         </div>

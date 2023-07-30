@@ -348,6 +348,14 @@ app.post("/findUserwithUID", async (req,res) => {
 
 })
 
+app.post("/getWhitelist", async (req,res) =>{
+  const id = req.body.body.id
+
+  const list = await db.getWhitelist(id)
+
+  res.send(list.whitelist_email)
+})
+
 
 app.listen(port, () => {
     console.log(`App listening on port ${port}`)
