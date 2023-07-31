@@ -33,7 +33,7 @@ const RegisterScreen = () => {
 
         console.log(body)
 
-        axiosInstance.post("/verifiy-user",{body}).then(() => {navigate("/chat")})
+        axiosInstance.post("/verifiy-user",{body}).then(() => {navigate(`/${name}/chat`)})
 
     }
 

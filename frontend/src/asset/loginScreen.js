@@ -39,6 +39,7 @@ const LoginScreen = () =>{
     const password = useRef(null)
 
     const navigate = useNavigate()
+    const {name} = useParams()
 
     const showTips = () =>{
         return(
@@ -116,7 +117,7 @@ const LoginScreen = () =>{
         .then((response) => {
             console.log("user response ",response.data)
             localStorage.setItem("userData",JSON.stringify(response.data))
-        }).then(() =>{navigate("/chat")})
+        }).then(() =>{navigate(`/${name}/chat`)})
     }
 
     useEffect(() =>{

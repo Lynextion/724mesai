@@ -11,7 +11,7 @@ import React, {useRef} from "react"
 import robotWait from "./svg/robotWait.gif"
 import {  signOut ,onAuthStateChanged} from "firebase/auth";
 import {auth} from '../firebase';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 
 
@@ -43,6 +43,8 @@ const ChatScreen = () =>{
 
     const navigate = useNavigate()
 
+    const {name} = useParams()
+
     const checkSigned = () =>{
         onAuthStateChanged(auth, (user) => {
             if (user) {
@@ -62,7 +64,7 @@ const ChatScreen = () =>{
               // User is signed out
               // ...
               console.log("user is logged out")
-              navigate('/')
+              navigate(`/${name}/`)
             }
           });
     }
