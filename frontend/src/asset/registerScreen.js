@@ -5,7 +5,7 @@ import left from "./svg/left.svg"
 import right from "./svg/right.svg"
 import {auth} from "../firebase"
 import { createUserWithEmailAndPassword, getAuth } from "firebase/auth"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import axios from "axios"
 
 const RegisterScreen = () => {
@@ -14,7 +14,28 @@ const RegisterScreen = () => {
     const password = useRef(null)
     const tempPassword =useRef(null)
 
-   
+    const {name} = useParams()
+
+    const axiosInstance = axios.create({
+        baseURL:"http://localhost:4000",
+        headers: {
+            'Content-Type': 'application/json',
+            'X-API-Key': "7aad182c-0877-4952-927a-baed5451fd84",
+          },
+    })
+    
+    const verifyUser = (email,uid) => {
+        
+        const body = {
+            "email":email,
+            "uid":uid
+        }
+
+        console.log(body)
+
+        axiosInstance.post("/verifiy-user",{body}).then(() => {navigate("/chat")})
+
+    }
 
     const tips = [{
         title : "Kelime sayısı konusunda net olun.",
@@ -65,11 +86,13 @@ const RegisterScreen = () => {
         }
     }
 
+    
+
     const registerUser = async (Email,Password) =>{
         await createUserWithEmailAndPassword(auth,Email,Password)
             .then((userRecord) =>{
-                console.log("succesfull:",userRecord.uid)
-                navigate("/chat")
+                console.log("succesfull:",userRecord.user.uid)
+                verifyUser(Email,userRecord.user.uid)
                 
             })
             .catch((error) =>{
@@ -77,15 +100,13 @@ const RegisterScreen = () => {
             })
     }
 
-    const getWhitelist = () =>{
-        const temp = localStorage.getItem("userData")
-        const jsonValue = JSON.parse(temp)
-
+    const getWhitelist = async () =>{
+        
         const body = {
-            "id":jsonValue[0].companyid
+            "name":name
         }
 
-       const whitelist = axios.post("http//localhost:4000",{body})
+       const whitelist = await axiosInstance.post("/getWhitelist",{body})
         .then((response) => {
            return response.data
         })
@@ -93,17 +114,25 @@ const RegisterScreen = () => {
         return whitelist
     }
 
-    const submit = () =>{
+    const submit = async () =>{
         const Email = email.current.value
         const Password = password.current.value
-        const whitelist = getWhitelist()
+        const TempPassword = tempPassword.current.value
+        const whitelist = await getWhitelist()
 
-        if(Email in whitelist){
-            registerUser(Email,Password)
+        if(whitelist.includes(Email)){
+            if(Password === TempPassword){
+                registerUser(Email,Password)
+
+            }
+            else{
+                console.log("Password do not match")
+            }
         }
 
         else{
             console.log("hirsizz varrr")
+            console.log(Email,'  ',whitelist)
         }
     }
 
@@ -113,7 +142,7 @@ const RegisterScreen = () => {
                 <div className="form">
                     <input className="email" ref={email} placeholder="email" />
                     <input className="password" ref={password} placeholder="Şifre" />
-                    <input className="password" placeholder="Şifre Tekrar"/>
+                    <input className="password" ref={tempPassword} laceholder="Şifre Tekrar"/>
                     <button className="submitRegister" onClick={submit}><img src={regLogo} />    <p className="registerText">Kayıt Ol</p></button>
                 </div>
             </div>

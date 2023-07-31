@@ -6,16 +6,48 @@ const fs = require("fs")
 const db = require("./dbConnect")
 const { execFile } = require('child_process');
 const path = require('path');
+require('dotenv').config()
 
+const API_KEY = process.env.API_KEY
 
 const app = express()
 const port = 4000
+
+const allowedOrigins = ["http://localhost:3000"]
+
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      console.log(origin)
+      callback(null, true);
+    } else {
+      callback(new Error(origin));
+    }
+  }
+};
+
+const validateApiKey = (req, res, next) => {
+  const apiKey = req.header('X-API-Key');
+  if (apiKey === API_KEY) {
+    next();
+  } else {
+    res.status(401).json({ error: 'Unauthorized' });
+  }
+};
+
+// Apply the API key validation middleware to all routes
+
+app.use(cors(corsOptions))
+app.options('*',cors(corsOptions))
+
+app.use(validateApiKey)
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({
     extended:true
 }))
-app.use(cors())
+
 
 app.get("/",(req,res) =>{
     res.json("Hellooo")
@@ -273,28 +305,41 @@ app.post("/collect-users", async(req,res) =>{
 
 app.post("/add-user", async (req,res) => {
   const userInfo = {
-    userName:req.body.userName,
-    companyId:req.body.companyId,
-    role:req.body.role,
-    firebaseId:req.body.firebaseId
+    userName:req.body.body.userName,
+    companyId:req.body.body.companyId,
+    role:req.body.body.role,
+    email:req.body.body.email
   }
 
   db.addUser(userInfo)
 
-  res.send(100)
+  res.sendStatus(100)
 
 })
 
 app.post("/update-user", async(req,res) =>{
   const userInfo = {
-      userName:req.body.userName,
-      companyId:req.body.companyId,
-      role:req.body.role,
-      avatar:req.body.avatar
+      userName:req.body.body.UserName,
+      userId:req.body.body.userId,
+      companyId:req.body.body.companyId,
+      role:req.body.body.role,
   }
   console.log(userInfo)
   db.updateUser(userInfo)
 
+})
+
+app.post("/verifiy-user",async(req,res) =>{
+  console.log(req.body.body)
+  const userInfo = {
+    email:req.body.body.email,
+    uid:req.body.body.uid
+  }
+
+  await db.verifyUser(userInfo)
+
+  res.json({"status":"done"})
+    
 })
 
 app.get("/delete-message/:id",async (req,res) =>{
@@ -349,9 +394,9 @@ app.post("/findUserwithUID", async (req,res) => {
 })
 
 app.post("/getWhitelist", async (req,res) =>{
-  const id = req.body.body.id
+  const name = req.body.body.name
 
-  const list = await db.getWhitelist(id)
+  const list = await db.getWhitelist(name)
 
   res.send(list.whitelist_email)
 })

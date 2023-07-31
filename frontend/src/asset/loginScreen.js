@@ -5,12 +5,12 @@ import right from "./svg/right.svg"
 import logo from "./svg/altin-logo-w-1.png"
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword,onAuthStateChanged } from "firebase/auth"
 import {auth} from "../firebase"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import axios from "axios"
 
 const LoginScreen = () =>{
 
-
+    
     const tips = [{
         title : "Kelime sayısı konusunda net olun.",
         context: "Asitanınızdan bir şey oluşturmasını istediğinizde, istediğiniz kelime sayısını belirtin. Örneğin, “Dijital Pazarlama hakkında 100 kelimelik bir makale yaz.” şeklinde yazın.  Ancak iyi bir uygulama olarak, ihtiyacınızdan daha yüksek bir kelime sayısı belirtmeniz daha iyidir. Çünkü böylece istemediğiniz kısımları çıkarabilir ve mükemmel bir içerik oluşturabilirsiniz."
@@ -21,6 +21,14 @@ const LoginScreen = () =>{
         context:"Testie"
     }
     ]
+
+    const axiosInstance = axios.create({
+        baseURL:"http://localhost:4000",
+        headers: {
+            'Content-Type': 'application/json',
+            'X-API-Key': "7aad182c-0877-4952-927a-baed5451fd84",
+          },
+    })
 
     const [tipCounter,setTipCounter] = useState(0)
     const [btPressed,setBTPressed] = useState(false)
@@ -104,7 +112,7 @@ const LoginScreen = () =>{
 
     const getUser = async (uid) =>{
         const body = {"uid":uid}
-        axios.post("http://localhost:4000/findUserwithUID",{body})
+        axiosInstance.post("findUserwithUID",{body})
         .then((response) => {
             console.log("user response ",response.data)
             localStorage.setItem("userData",JSON.stringify(response.data))

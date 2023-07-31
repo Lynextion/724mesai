@@ -176,7 +176,7 @@ const addUser = async(userInfo) => {
         const id = uuidv4()
         
 
-        await client.execute(`INSERT INTO companies.woker (id,name,role,companyid) VALUES (${id},'${userInfo.userName}','${userInfo.role}',${userInfo.companyId});`)
+        await client.execute(`INSERT INTO companies.woker (id,name,role,companyid,email,verified) VALUES (${id},'${userInfo.userName}','${userInfo.role}',${userInfo.companyId},'${userInfo.email}',False);`)
 
     
     }
@@ -202,7 +202,8 @@ const addFirebaseId = async(userInfo) =>{
 
 const findUserwithEmail = async (userInfo) =>{
    
-    await client.execute(`SELECT * FROM companies.woker WHERE email='${userInfo.email}';`)
+   const userEmail =  await client.execute(`SELECT * FROM companies.woker WHERE email='${userInfo.email}';`)
+   return userEmail.first()
 }
 
 const findCompany = async (userId) =>{
@@ -237,13 +238,22 @@ const updateUser = async(userInfo) =>{
 
        
 
-        await client.execute(`UPDATE companies.woker SET name=${userInfo.userName}, companyid=${userInfo.companyId},role=${userInfo.role}  WHERE id=${userInfo.userId};`)
+        await client.execute(`UPDATE companies.woker SET verified=True  WHERE id=${userInfo.userId};`)
 
     }
 
     catch(err){
         return err
     }
+}
+
+const verifyUser =  async (userInfo) =>{
+
+    const id = await client.execute(`SELECT * FROM companies.woker WHERE email='${userInfo.email}';`)
+    console.log(id.first().id)
+    await client.execute(`UPDATE companies.woker SET  uid='${userInfo.uid}' WHERE id=${id.first().id}; `)
+    await client.execute(`UPDATE companies.woker SET verified=True  WHERE id=${id.first().id}; `)
+
 }
 
 const deleteMessage = async(messageInfo) =>{
@@ -279,10 +289,10 @@ const findUserUID = async(uid) => {
     return user.rows
 }
 
-const getWhitelist = async (id) =>{
-    const list = await client.execute(`SELECT whitelist_email FROM companies.company WHERE id=${id}`)
+const getWhitelist = async (name) =>{
+    const list = await client.execute(`SELECT whitelist_email FROM companies.company WHERE name='${name}'`)
 
     return list.first()
 }
 
-module.exports = {receiveMessage,addMessage,createMessage,findUser,findCompany,findUsers,addUser,updateUser,allMessage,deleteMessage,insertWhiteList,addFirebaseId,findUserwithEmail,findUserUID,getWhitelist}
+module.exports = {receiveMessage,addMessage,createMessage,findUser,findCompany,findUsers,addUser,updateUser,allMessage,deleteMessage,insertWhiteList,addFirebaseId,findUserwithEmail,findUserUID,getWhitelist,verifyUser}

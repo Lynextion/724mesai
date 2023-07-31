@@ -1,11 +1,12 @@
 import "./adminPanel.css"
 import Logo from "./svg/altin-logo-w-1.png"
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { generatePassword } from "./generate password"
-import { createUserWithEmailAndPassword } from "firebase/auth"
+import { createUserWithEmailAndPassword,onAuthStateChanged } from "firebase/auth"
 import {auth} from "../firebase"
 import axios from "axios"
 import robotWait from "./svg/robotWait.gif"
+import { useNavigate } from "react-router-dom"
 
 const AdminPanel = () =>{
 
@@ -16,19 +17,35 @@ const AdminPanel = () =>{
     const userName = useRef(null)
     const userRol = useRef(null)
     const email = useRef(null)
+
+    const navigate = useNavigate()
     
 
     const [wait,setWait] = useState(false)
+
+    const axiosInstance = axios.create({
+        baseURL:"http://localhost:4000",
+        headers: {
+            'Content-Type': 'application/json',
+            'X-API-Key': "7aad182c-0877-4952-927a-baed5451fd84",
+          },
+    })
 
     const addWhiteList = (email,id) =>{
         const body = {
             "email":email,
             "id":id
         }
-        axios.post("http://localhost:4000/insert-whitelist",{body})
+        axiosInstance.post("/insert-whitelist",{body})
         .then(() =>{
             setWait(false)
         })
+    }
+
+    const addUser = (userInfo) => {
+        const body = userInfo
+
+        axiosInstance.post("/add-user",{body})
     }
 
     const userAddBT = () =>{
@@ -49,12 +66,62 @@ const AdminPanel = () =>{
 
     const userSumbit= () =>{
         const Email = email.current.value
+        const Username = userName.current.value
+        const Role = userRol.current.value
         const temp = JSON.parse(localStorage.getItem("userData"))
+        
+        const userInfo = {
+            "email":Email,
+            "companyId":temp[0].companyid,
+            "role":Role,
+            "Username":Username
+        }
+
+
         console.log(temp[0])
         setWait(true)
         addWhiteList(Email,temp[0].companyid)
-        
+        addUser(userInfo)        
     }
+
+    const checkIsAdmin = () =>{
+        const temp = JSON.parse(localStorage.getItem("userData"))
+        const isAdmin = temp[0].isadmin
+        console.log("isadmin",isAdmin)
+
+        if(!isAdmin){
+            navigate("/chat")
+        }
+    }
+
+    const checkSigned = () =>{
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+              // User is signed in, see docs for a list of available properties
+              // https://firebase.google.com/docs/reference/js/firebase.User
+              const User = user
+              
+              if(!localStorage.getItem("userFirebaseData")){
+                localStorage.setItem("userFirebaseData",User)
+              }
+
+             
+        
+             
+              
+            } else {
+              // User is signed out
+              // ...
+              console.log("user is logged out")
+              navigate('/')
+            }
+          });
+}
+
+    useEffect(() =>{
+        checkSigned()
+        checkIsAdmin()
+    },[])
 
     return(
         <div className="panelBody">

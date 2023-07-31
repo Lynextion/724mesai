@@ -11,16 +11,16 @@ import {BrowserRouter, Routes, Route} from "react-router-dom";
 
 function App() {
 
-  
+
   return (
     <BrowserRouter>
       <div className="App">
       <Routes>
       
-        <Route path="/" element={<LoginScreen/>}></Route>
-        <Route path="/register" element={<RegisterScreen/>}></Route>
-        <Route path="/chat/" element={<ChatScreen/>}></Route>
-        <Route path="/admin" element={<Panel/>}></Route>
+        <Route path="/:name/" element={<LoginScreen/>}></Route>
+        <Route path="/:name/register" element={<RegisterScreen/>}></Route>
+        <Route path="/:name/chat/" element={<ChatScreen/>}></Route>
+        <Route path="/:name/admin" element={<Panel/>}></Route>
         <Route path='*' element={<>404 Not Found</>}></Route>
       </Routes>
       </div>

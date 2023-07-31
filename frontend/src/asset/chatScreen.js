@@ -20,7 +20,6 @@ const ChatScreen = () =>{
     const buttonRef = useRef(null)
     const bottomScroll = useRef(null)
 
-   
 
     const [topics,setTopics] = useState([''])
     const [collected,setCollected] = useState(false)
@@ -66,7 +65,15 @@ const ChatScreen = () =>{
               navigate('/')
             }
           });
-}
+    }
+
+    const axiosInstance = axios.create({
+        baseURL:"http://localhost:4000",
+        headers: {
+            'Content-Type': 'application/json',
+            'X-API-Key': "7aad182c-0877-4952-927a-baed5451fd84",
+          },
+    })
 
     const callTopics =  async ()  =>{
 
@@ -75,7 +82,7 @@ const ChatScreen = () =>{
         
             const data = {"userId": userId}
             console.log(data)
-            axios.post("http://localhost:4000/all-message",{data}).then((response) => {scrapTopics(response.data)})
+            axiosInstance.post("/all-message",{data}).then((response) => {scrapTopics(response.data)})
         }
         catch(err){
             return(<>
@@ -180,7 +187,7 @@ const ChatScreen = () =>{
                 updateMessage(body.message)
 
 
-                await axios.post("http://localhost:4000/message",{body}).then((response) => {
+                await axiosInstance.post("/message",{body}).then((response) => {
                     updateMessage(response.data)
                 }).then(() => setActivate(true)).then(() => setDisabled(false))
             }
@@ -199,7 +206,7 @@ const ChatScreen = () =>{
                 updateMessage(body.message)
 
 
-                await axios.post("http://localhost:4000/create-message",{body}).then((response) => {
+                await axiosInstance.post("/create-message",{body}).then((response) => {
                     updateMessage(response.data)
                 }).then(() => setActivate(true)).then(() => setDisabled(false))
                 callTopics()
@@ -226,7 +233,7 @@ const ChatScreen = () =>{
     }
 
     const deleteMessage =  async (id) =>{
-        await axios.get(`http://localhost:4000/delete-message/${id}`).then(() => callTopics() )
+        await axiosInstance.get(`/delete-message/${id}`).then(() => callTopics() )
     }
 
     const wait = () =>{
