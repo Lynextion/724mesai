@@ -32,7 +32,7 @@ jobs:
 
       - name: Start Middleware
         working-directory: middleware
-        run: node middleware
+        run: npm start > /dev/null 2>&1 & # Run npm start in the background
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
