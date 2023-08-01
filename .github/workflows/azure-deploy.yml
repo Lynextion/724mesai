@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+env:
+  AZURE_WEBAPP_NAME: 724mesai
 
 jobs:
   build-and-deploy:
@@ -32,14 +34,16 @@ jobs:
 
       - name: Start Middleware
         working-directory: middleware
-        run: node middleware
+        run: npm start > /dev/null 2>&1 & # Run npm start in the background
 
-      - name: Deploy to Azure Web App
+      - name: 'Run Azure webapp deploy action using publish profile credentials'
         uses: azure/webapps-deploy@v2
-        with:
-          app-name: your-azure-web-app-name # Replace with your actual Azure Web App name
+        with: 
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
           package: ./frontend/build
-
+          username: ${{ secrets.WEBAPP_USERNAME }}
+          password: ${{ secrets.WEBAPP_PASSWORD }}
+        
       - name: Post-Deployment Cleanup
         run: |
           kill $(pgrep node) # Terminate the middleware server after the deployment
