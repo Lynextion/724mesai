@@ -1,0 +1,46 @@
+name: Azure Deployment
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20.2.0'
+
+      - name: Install Dependencies
+        working-directory: frontend
+        run: npm install
+
+      - name: Build React Application
+        working-directory: frontend
+        run: npm run build
+
+      - name: Install Middleware Dependencies
+        working-directory: middleware
+        run: npm install
+
+      - name: Start Middleware
+        working-directory: middleware
+        run: node middleware
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: your-azure-web-app-name # Replace with your actual Azure Web App name
+          package: ./frontend/build
+
+      - name: Post-Deployment Cleanup
+        run: |
+          kill $(pgrep node) # Terminate the middleware server after the deployment
+
