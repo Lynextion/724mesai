@@ -24,7 +24,7 @@ jobs:
 
       - name: Build React Application
         working-directory: frontend
-        run: npm run build
+        run: CI='' npm run build
 
       - name: Install Middleware Dependencies
         working-directory: middleware
