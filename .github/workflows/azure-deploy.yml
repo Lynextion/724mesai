@@ -33,13 +33,7 @@ jobs:
       - name: Start Middleware
         working-directory: middleware
         run: npm start > /dev/null 2>&1 & # Run npm start in the background
-
-      - name: Deploy to Azure Web App
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: your-azure-web-app-name # Replace with your actual Azure Web App name
-          package: ./frontend/build
-
+        
       - name: Post-Deployment Cleanup
         run: |
           kill $(pgrep node) # Terminate the middleware server after the deployment
