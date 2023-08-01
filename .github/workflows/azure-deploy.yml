@@ -40,6 +40,9 @@ jobs:
         uses: azure/webapps-deploy@v2
         with: 
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          package: ./frontend/build
+          username: ${{ secrets.WEBAPP_USERNAME }}
+          password: ${{ secrets.WEBAPP_PASSWORD }}
         
       - name: Post-Deployment Cleanup
         run: |
