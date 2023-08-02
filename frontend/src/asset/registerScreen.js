@@ -7,6 +7,8 @@ import {auth} from "../firebase"
 import { createUserWithEmailAndPassword, getAuth } from "firebase/auth"
 import { useNavigate, useParams } from "react-router-dom"
 import axios from "axios"
+import CryptoJS from "crypto-js"
+
 
 const RegisterScreen = () => {
 
@@ -92,6 +94,7 @@ const RegisterScreen = () => {
         await createUserWithEmailAndPassword(auth,Email,Password)
             .then((userRecord) =>{
                 console.log("succesfull:",userRecord.user.uid)
+                const 
                 verifyUser(Email,userRecord.user.uid)
                 
             })

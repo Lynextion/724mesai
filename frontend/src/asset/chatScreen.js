@@ -12,7 +12,7 @@ import robotWait from "./svg/robotWait.gif"
 import {  signOut ,onAuthStateChanged} from "firebase/auth";
 import {auth} from '../firebase';
 import { useNavigate, useParams } from 'react-router-dom';
-
+import CryptoJS from 'crypto-js'
 
 
 const ChatScreen = () =>{
@@ -20,7 +20,18 @@ const ChatScreen = () =>{
     const buttonRef = useRef(null)
     const bottomScroll = useRef(null)
 
+    const ENCRYPTION_KEY = 'o7UZXkzXFp3iMbGpJqF3hbilW1tcwCxfBDDgVZXrmO4dLE62kYcawIVvS5EULxtE'
 
+    const encryptData = (data, key) => {
+        const encrypted = CryptoJS.AES.encrypt(data, key).toString();
+        return encrypted;
+      };
+
+    const decryptData = (data,key) =>{
+        const decryptedData = CryptoJS.AES.decrypt(data,key).toString(CryptoJS.enc.Utf8)
+        return decryptedData
+    }
+        
     const [topics,setTopics] = useState([''])
     const [collected,setCollected] = useState(false)
     const [messageIds,setMessageIds] = useState([])
@@ -30,13 +41,13 @@ const ChatScreen = () =>{
     const [currentMessageId,setCurrentMessageId] = useState()
     const [send,setSend] = useState()
     const [newMessage,setNewMessage] = useState(false)
-    const [isFailed,setIsFailed] = useState(false)
     const [activate,setActivate] = useState(true)
     const [disabled,setDisabled] = useState(false)
     const[pageLoaded,setPageLoaded] = useState(false)
     const [showTopic,setShowTopic] = useState(true)
     
-    const tempInfo = JSON.parse(localStorage.getItem("userData"))
+    const tempLocal = decryptData(localStorage.getItem("userData"),ENCRYPTION_KEY)
+    const tempInfo = JSON.parse(tempLocal)
     const userInfo = tempInfo[0]
     const tempuserId = userInfo.id
     const [userId,setUserId] = useState(tempuserId)
@@ -53,7 +64,8 @@ const ChatScreen = () =>{
               const User = user
               
               if(!localStorage.getItem("userFirebaseData")){
-                localStorage.setItem("userFirebaseData",User)
+                const encryptedData = encryptData(user,ENCRYPTION_KEY)
+                localStorage.setItem("userFirebaseData",encryptedData)
               }
 
              
@@ -76,6 +88,8 @@ const ChatScreen = () =>{
             'X-API-Key': "7aad182c-0877-4952-927a-baed5451fd84",
           },
     })
+
+    
 
     const callTopics =  async ()  =>{
 

@@ -10,6 +10,7 @@
     "axios": "^1.4.0",
     "clipboard": "^2.0.11",
     "crypto-browserify": "^3.12.0",
+    "crypto-js": "^4.1.1",
     "dotenv": "^16.3.1",
     "firebase": "^10.0.0",
     "generate-password": "^1.7.0",

@@ -139,7 +139,7 @@ justify-content: center;
 gap: 20px;
 align-self: center;
 background: #444654;
-white-space: pre-wrap;
+white-space: break-spaces;
 width: 60%;
 }
 

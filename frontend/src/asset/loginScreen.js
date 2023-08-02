@@ -7,8 +7,22 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword,onAuthStateC
 import {auth} from "../firebase"
 import { useNavigate, useParams } from "react-router-dom"
 import axios from "axios"
+import CryptoJS from "crypto-js"
+
 
 const LoginScreen = () =>{
+
+    const ENCRYPTION_KEY = 'o7UZXkzXFp3iMbGpJqF3hbilW1tcwCxfBDDgVZXrmO4dLE62kYcawIVvS5EULxtE'
+
+    const encryptData = (data, key) => {
+        const encrypted = CryptoJS.AES.encrypt(data, key).toString();
+        return encrypted;
+      };
+
+    const decryptData = (data,key) =>{
+        const decryptedData = CryptoJS.AES.decrypt(data,key).toString(CryptoJS.enc.Utf8)
+        return decryptedData
+    }
 
     
     const tips = [{
@@ -81,7 +95,9 @@ const LoginScreen = () =>{
               // https://firebase.google.com/docs/reference/js/firebase.User
               const data = user
               getUser(data.uid)
-              localStorage.setItem("userFirebaseData",JSON.stringify(data))
+              const JSONdata = JSON.stringify(data)
+              const encrypted = encryptData(JSONdata,ENCRYPTION_KEY)
+              localStorage.setItem("userFirebaseData",encrypted)
               
               
             } else {
@@ -116,7 +132,9 @@ const LoginScreen = () =>{
         axiosInstance.post("findUserwithUID",{body})
         .then((response) => {
             console.log("user response ",response.data)
-            localStorage.setItem("userData",JSON.stringify(response.data))
+            const JSONdata = JSON.stringify(response.data)
+            const encrypted = encryptData(JSONdata,ENCRYPTION_KEY)
+            localStorage.setItem("userData",encrypted)
         }).then(() =>{navigate(`/${name}/chat`)})
     }
 
@@ -125,7 +143,9 @@ const LoginScreen = () =>{
     },[])
 
     const saveLocalStorage = async (data) => {
-        localStorage.setItem("userFirebaseData",JSON.stringify(data))
+        const JSONdata = JSON.stringify(data)
+        const encrypted = encryptData(JSONdata,ENCRYPTION_KEY)
+        localStorage.setItem("userFirebaseData",encrypted)
     }
   
 

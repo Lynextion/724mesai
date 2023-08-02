@@ -7,8 +7,22 @@ import {auth} from "../firebase"
 import axios from "axios"
 import robotWait from "./svg/robotWait.gif"
 import { useNavigate } from "react-router-dom"
+import CryptoJS from "crypto-js"
 
 const AdminPanel = () =>{
+
+
+    const ENCRYPTION_KEY = 'o7UZXkzXFp3iMbGpJqF3hbilW1tcwCxfBDDgVZXrmO4dLE62kYcawIVvS5EULxtE'
+
+    const encryptData = (data, key) => {
+        const encrypted = CryptoJS.AES.encrypt(data, key).toString();
+        return encrypted;
+      };
+
+    const decryptData = (data,key) =>{
+        const decryptedData = CryptoJS.AES.decrypt(data,key).toString(CryptoJS.enc.Utf8)
+        return decryptedData
+    }
 
     const companyName = useRef(null)
     const companyRegion = useRef(null)
@@ -68,8 +82,10 @@ const AdminPanel = () =>{
         const Email = email.current.value
         const Username = userName.current.value
         const Role = userRol.current.value
-        const temp = JSON.parse(localStorage.getItem("userData"))
-        
+        const localData = localStorage.getItem("userData")
+        const decrypted = decryptData(localData,ENCRYPTION_KEY)
+        const temp = JSON.parse(decrypted)
+
         const userInfo = {
             "email":Email,
             "companyId":temp[0].companyid,
@@ -85,7 +101,9 @@ const AdminPanel = () =>{
     }
 
     const checkIsAdmin = () =>{
-        const temp = JSON.parse(localStorage.getItem("userData"))
+        const localData = localStorage.getItem("userData")
+        const decrypted = decryptData(localData,ENCRYPTION_KEY)
+        const temp = JSON.parse(decrypted)
         const isAdmin = temp[0].isadmin
         console.log("isadmin",isAdmin)
 
