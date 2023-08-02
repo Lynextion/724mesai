@@ -94,7 +94,6 @@ const RegisterScreen = () => {
         await createUserWithEmailAndPassword(auth,Email,Password)
             .then((userRecord) =>{
                 console.log("succesfull:",userRecord.user.uid)
-                const 
                 verifyUser(Email,userRecord.user.uid)
                 
             })
