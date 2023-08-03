@@ -31,7 +31,8 @@ const ChatScreen = () =>{
         const decryptedData = CryptoJS.AES.decrypt(data,key).toString(CryptoJS.enc.Utf8)
         return decryptedData
     }
-        
+    
+    const [companyFound,setCompanyFound] = useState(true)
     const [topics,setTopics] = useState([''])
     const [collected,setCollected] = useState(false)
     const [messageIds,setMessageIds] = useState([])
@@ -157,8 +158,27 @@ const ChatScreen = () =>{
         )
     }
 
+    const findCompany = async() =>{
+
+        const body ={
+            name:name
+        }
+
+        const companyInfo = await axiosInstance.post("/findCompanyByName",{body}).then((response) => {return response.data})
+        console.log(companyInfo)
+        if(companyInfo === "No Company Found"){
+            navigate(`/${name}/`)
+            console.log("noooy")
+        }
+
+        else{
+            
+            checkSigned()
+        }
+    }
+
     useEffect(() =>{
-        checkSigned()
+        findCompany()
 
 
         
@@ -274,7 +294,7 @@ const ChatScreen = () =>{
     const handleLogout = () => {               
         signOut(auth).then(() => {
         // Sign-out successful.
-            navigate("/");
+            navigate(`s/${name}/`);
             localStorage.removeItem("userData")
             localStorage.removeItem("userFirebaseData")
             console.log("Signed out successfully")

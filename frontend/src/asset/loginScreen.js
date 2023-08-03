@@ -3,11 +3,13 @@ import { useEffect, useRef, useState } from "react"
 import left from "./svg/left.svg"
 import right from "./svg/right.svg"
 import logo from "./svg/altin-logo-w-1.png"
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword,onAuthStateChanged } from "firebase/auth"
+import {  signInWithEmailAndPassword,onAuthStateChanged } from "firebase/auth"
 import {auth} from "../firebase"
 import { useNavigate, useParams } from "react-router-dom"
 import axios from "axios"
 import CryptoJS from "crypto-js"
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 const LoginScreen = () =>{
@@ -45,9 +47,7 @@ const LoginScreen = () =>{
     })
 
     const [tipCounter,setTipCounter] = useState(0)
-    const [btPressed,setBTPressed] = useState(false)
-    const [tempEmail,setTempEmail] = useState('')
-    const [tempPassword,setTempPassword] = useState('')
+    const [companyFound,setCompanyFound] = useState(true)
 
     const email = useRef(null)
     const password = useRef(null)
@@ -115,6 +115,16 @@ const LoginScreen = () =>{
         await signInWithEmailAndPassword(auth,Email,Password)
         .then((userCredential) =>{
             const user = userCredential.user
+            toast.success('🦄 Wow so easy!', {
+                position: "bottom-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "dark",
+                });
             saveLocalStorage(user)
             console.log(user)
             return user.uid
@@ -138,8 +148,27 @@ const LoginScreen = () =>{
         }).then(() =>{navigate(`/${name}/chat`)})
     }
 
+    const findCompany = async() =>{
+
+        const body ={
+            name:name
+        }
+
+        const companyInfo = await axiosInstance.post("/findCompanyByName",{body}).then((response) => {return response.data})
+        console.log(companyInfo)
+        if(companyInfo === "No Company Found"){
+            setCompanyFound(false)
+            console.log("noooy")
+        }
+
+        else{
+            setCompanyFound(true)
+            checkSigned()
+        }
+    }
+
     useEffect(() =>{
-        checkSigned()
+        findCompany()
     },[])
 
     const saveLocalStorage = async (data) => {
@@ -147,10 +176,10 @@ const LoginScreen = () =>{
         const encrypted = encryptData(JSONdata,ENCRYPTION_KEY)
         localStorage.setItem("userFirebaseData",encrypted)
     }
-  
 
-    return(
-        <div className="body">
+    const form = () =>{
+        return(
+            <>
             <div className="loginSide">
                 <div className="loginForm">
                         <img className="logo" src={logo} />
@@ -165,7 +194,34 @@ const LoginScreen = () =>{
                 {showTips()}
                <button className="sliderBT" onClick={forwardTips}> <img src={right}/> </button>
             </div>
+            <ToastContainer
+                position="bottom-right"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="dark"
+            />
+            </>
+        )
+    } 
+    
+    const error = () =>{
+        return(
+            <>
+                <h1>Company Not Found</h1>
+            </>
+        )
+    }
 
+    return(
+        <div className="body">
+            {companyFound && form() }
+            {!companyFound && error()}
         </div>
     )
 }

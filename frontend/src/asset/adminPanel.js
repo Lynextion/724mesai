@@ -6,11 +6,12 @@ import { createUserWithEmailAndPassword,onAuthStateChanged } from "firebase/auth
 import {auth} from "../firebase"
 import axios from "axios"
 import robotWait from "./svg/robotWait.gif"
-import { useNavigate } from "react-router-dom"
+import { useNavigate,useParams } from "react-router-dom"
 import CryptoJS from "crypto-js"
 
 const AdminPanel = () =>{
 
+    const {name} = useParams()
 
     const ENCRYPTION_KEY = 'o7UZXkzXFp3iMbGpJqF3hbilW1tcwCxfBDDgVZXrmO4dLE62kYcawIVvS5EULxtE'
 
@@ -134,11 +135,30 @@ const AdminPanel = () =>{
               navigate('/')
             }
           });
+}       
+
+const findCompany = async() =>{
+
+    const body ={
+        name:name
+    }
+
+    const companyInfo = await axiosInstance.post("/findCompanyByName",{body}).then((response) => {return response.data})
+    console.log(companyInfo)
+    if(companyInfo === "No Company Found"){
+        navigate(`/${name}/`)
+        console.log("noooy")
+    }
+
+    else{
+        
+        checkSigned()
+        checkIsAdmin()
+    }
 }
 
     useEffect(() =>{
-        checkSigned()
-        checkIsAdmin()
+        findCompany()
     },[])
 
     return(

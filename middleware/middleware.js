@@ -402,6 +402,23 @@ app.post("/getWhitelist", async (req,res) =>{
 })
 
 
+app.post("/findCompanyByName", async (req,res) => {
+  const name = req.body.body.name
+
+  const info = await db.findCompanyByName(name)
+  console.log(info)
+
+  if(info.length !== 0){
+    res.send(info)
+  }
+
+  else{
+    res.send("No Company Found")
+  }
+
+})
+
+
 app.listen(port, () => {
     console.log(`App listening on port ${port}`)
 })

@@ -225,6 +225,15 @@ const findCompany = async (userId) =>{
     }
 }
 
+const findCompanyByName = async (name) =>{
+
+   
+        const companyInfo = await client.execute(`SELECT * FROM companies.company WHERE name='${name}';`)
+        return companyInfo.rows
+            
+   
+}
+
 const updateCompany = async(companyInfo) =>{
     
 
@@ -295,4 +304,4 @@ const getWhitelist = async (name) =>{
     return list.first()
 }
 
-module.exports = {receiveMessage,addMessage,createMessage,findUser,findCompany,findUsers,addUser,updateUser,allMessage,deleteMessage,insertWhiteList,addFirebaseId,findUserwithEmail,findUserUID,getWhitelist,verifyUser}
+module.exports = {receiveMessage,addMessage,createMessage,findUser,findCompany,findUsers,addUser,updateUser,allMessage,deleteMessage,insertWhiteList,addFirebaseId,findUserwithEmail,findUserUID,getWhitelist,verifyUser,findCompanyByName}
