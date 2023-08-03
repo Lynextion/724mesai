@@ -234,7 +234,11 @@ app.post("/create-message", async (req,res) =>{
    }
    console.log("i call",updatedMessages)
    db.addMessage(updatedMessages)
-   res.send(result); 
+   const sendedData = {
+    result:result,
+    messageId:updatedMessages.messageInfo.messageId
+   }
+   res.send(sendedData); 
    
  });
 
@@ -258,7 +262,7 @@ app.post("/all-message", async (req,res) => {
         date : data.date,
         messages: data.messages.map((object) => {return(JSON.parse(object))}),
         topic : data.topic,
-        userid : data.userId
+        userid : userId
       }
     })
     console.log("adataaa ",data)

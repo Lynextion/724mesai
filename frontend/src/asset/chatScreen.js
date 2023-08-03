@@ -146,6 +146,7 @@ const ChatScreen = () =>{
         })
         
         setCurrentMessageId(e)
+        console.log("e")
         setNewMessage(false)
     }
     
@@ -187,6 +188,7 @@ const ChatScreen = () =>{
   
     const textAreaOnChange = (e) => {
         setSend(e.target.value)
+        e.target.value = ''
 
     }
 
@@ -243,7 +245,9 @@ const ChatScreen = () =>{
 
 
                 await axiosInstance.post("/create-message",{body}).then((response) => {
-                    updateMessage(response.data)
+                    updateMessage(JSON.parse(response.data.result))
+                    console.log("response result",response.data.result)
+                    setCurrentMessageId(response.data.messageId)
                 }).then(() => setActivate(true)).then(() => setDisabled(false))
                 callTopics()
                 setNewMessage(false)
