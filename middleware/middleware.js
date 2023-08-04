@@ -7,6 +7,7 @@ const db = require("./dbConnect")
 const { execFile } = require('child_process');
 const path = require('path');
 require('dotenv').config()
+const { v4: uuidv4 } = require('uuid');
 
 const API_KEY = process.env.API_KEY
 
@@ -315,9 +316,11 @@ app.post("/add-user", async (req,res) => {
     email:req.body.body.email
   }
 
-  db.addUser(userInfo)
+  const id = uuidv4()
 
-  res.sendStatus(100)
+  db.addUser(userInfo,id)
+  console.log('id id id ',id)
+  res.send(id)
 
 })
 
@@ -420,6 +423,15 @@ app.post("/findCompanyByName", async (req,res) => {
     res.send("No Company Found")
   }
 
+})
+
+app.post("/addWorkerId", async (req,res) => {
+  const id = req.body.body.workerId
+  const companyId = req.body.body.companyId
+  console.log("iddddd",id)
+
+  await db.addWorkerId(id,companyId)
+  res.sendStatus(200)
 })
 
 

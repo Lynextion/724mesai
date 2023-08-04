@@ -20,10 +20,14 @@ const AdminPanel = () =>{
         return encrypted;
       };
 
+    
+
     const decryptData = (data,key) =>{
         const decryptedData = CryptoJS.AES.decrypt(data,key).toString(CryptoJS.enc.Utf8)
         return decryptedData
     }
+
+    const [tempId,setTempId] = useState()
 
     const companyName = useRef(null)
     const companyRegion = useRef(null)
@@ -57,10 +61,13 @@ const AdminPanel = () =>{
         })
     }
 
-    const addUser = (userInfo) => {
+    const addUser = async (userInfo) => {
         const body = userInfo
 
-        axiosInstance.post("/add-user",{body})
+      const id =  await axiosInstance.post("/add-user",{body}).then((response) => {console.log(response.data) 
+        return response.data})
+       console.log("userdir bu ha bi de id",id)
+       return id
     }
 
     const userAddBT = () =>{
@@ -79,7 +86,17 @@ const AdminPanel = () =>{
         )
     }
 
-    const userSumbit= () =>{
+    const addWorkerId = (workerId,companyId) =>{
+        const body = {
+            "workerId" : workerId,
+            "companyId": companyId
+        }
+        console.log("BodYdiR bu haa",body)
+        axiosInstance.post("/addWorkerId",{body})
+        
+    }
+
+    const userSumbit= async () =>{
         const Email = email.current.value
         const Username = userName.current.value
         const Role = userRol.current.value
@@ -97,8 +114,12 @@ const AdminPanel = () =>{
 
         console.log(temp[0])
         setWait(true)
+        const id = await addUser(userInfo)
+        
+        console.log('id idi dididi ',id)
+        addWorkerId(id,temp[0].companyid)
         addWhiteList(Email,temp[0].companyid)
-        addUser(userInfo)        
+              
     }
 
     const checkIsAdmin = () =>{

@@ -166,19 +166,18 @@ const findUsers = async (companyId) =>{
 }
 
 
-const addUser = async(userInfo) => {
+const addUser = async(userInfo,id) => {
     
 
     try{
 
         
 
-        const id = uuidv4()
+        
         
 
         await client.execute(`INSERT INTO companies.woker (id,name,role,companyid,email,verified) VALUES (${id},'${userInfo.userName}','${userInfo.role}',${userInfo.companyId},'${userInfo.email}',False);`)
-
-    
+       
     }
     catch(err){
         return err
@@ -304,4 +303,11 @@ const getWhitelist = async (name) =>{
     return list.first()
 }
 
-module.exports = {receiveMessage,addMessage,createMessage,findUser,findCompany,findUsers,addUser,updateUser,allMessage,deleteMessage,insertWhiteList,addFirebaseId,findUserwithEmail,findUserUID,getWhitelist,verifyUser,findCompanyByName}
+const addWorkerId = async (id,companyId) => {
+    console.log('db id',id)
+    await client.execute(`UPDATE companies.company SET workerid= workerid + [${id}] WHERE id=${companyId}`)
+    
+}
+
+
+module.exports = {receiveMessage,addMessage,createMessage,findUser,findCompany,findUsers,addUser,updateUser,allMessage,deleteMessage,insertWhiteList,addFirebaseId,findUserwithEmail,findUserUID,getWhitelist,verifyUser,findCompanyByName,addWorkerId}
