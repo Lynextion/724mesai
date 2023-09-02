@@ -6,13 +6,13 @@ import CompanyLogo from "./svg/altin-logo-w-1.png"
 import Add from "./svg/add.svg"
 import Messages from "./messages"
 import Commands from "./command"
-import { v4 as uuidv4 } from 'uuid';
 import React, {useRef} from "react"
 import robotWait from "./svg/robotWait.gif"
 import {  signOut ,onAuthStateChanged} from "firebase/auth";
 import {auth} from '../firebase';
 import { useNavigate, useParams } from 'react-router-dom';
 import CryptoJS from 'crypto-js'
+import UserScreen from "./userScreen"
 
 
 const ChatScreen = () =>{
@@ -32,10 +32,8 @@ const ChatScreen = () =>{
         return decryptedData
     }
     
-    const [companyFound,setCompanyFound] = useState(true)
-    const [topics,setTopics] = useState([''])
+    
     const [collected,setCollected] = useState(false)
-    const [messageIds,setMessageIds] = useState([])
     const [messageInfo,setMessageInfo] = useState([{}])
     let [allMessage, setAllMessage] = useState([{}])
     const [message,setMessage] = useState([])
@@ -111,9 +109,8 @@ const ChatScreen = () =>{
     const scrapTopics = (data) =>{
         
         const topic = data.map((data) =>{return(data.topic)}) 
-        setTopics(topic)
         const tempMessageId = data.map((data) =>{return((data.messageId))})
-        setMessageIds(tempMessageId)
+        
         console.log("datadır bu ha",data)
         setAllMessage(data)
 
@@ -207,26 +204,37 @@ const ChatScreen = () =>{
         })
     }
 
+    const tempUpdateMessage = (message,id) =>{
+        console.log("lalala",message,id)
+        allMessage.map((data) =>{
+            if (data.messageId === id){
+                console.log("listtt",data.messages)
+                data.messages.push(message)
+                setMessage(data.messages)
+            }
+        })
+    }
+
     const sentMessage = async ()  =>{
         bottomScroll.current.scrollIntoView({behavior:'smooth'})
 
         if(setActivate){
-
+            const tempMessageId = currentMessageId
             if(newMessage === false){
                 setActivate(false)
                 setDisabled(true)
                 const body = {
                     "userId": userId,
-                    "messageId":currentMessageId,
+                    "messageId":tempMessageId,
                     "message":{"role":"user","content":send}
                 }
                 setSend('')
                 console.log("body",body)
-                updateMessage(body.message)
+                tempUpdateMessage(body.message,tempMessageId)
 
 
                 await axiosInstance.post("/message",{body}).then((response) => {
-                    updateMessage(response.data)
+                    tempUpdateMessage(response.data,tempMessageId)
                 }).then(() => setActivate(true)).then(() => setDisabled(false))
             }
 
@@ -298,7 +306,7 @@ const ChatScreen = () =>{
     const handleLogout = () => {               
         signOut(auth).then(() => {
         // Sign-out successful.
-            navigate(`s/${name}/`);
+            navigate(`/${name}/`);
             localStorage.removeItem("userData")
             localStorage.removeItem("userFirebaseData")
             console.log("Signed out successfully")
@@ -324,7 +332,8 @@ const ChatScreen = () =>{
                     {collected && renderTopics()}
                 </div>
                 )}
-                <button onClick={handleLogout}>Sign Out</button>
+                <UserScreen signOut={handleLogout.bind(this)}/>
+                
             </div>
             <div className="chat">
                 <div className="messageContainer">

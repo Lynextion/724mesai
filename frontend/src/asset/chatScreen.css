@@ -229,3 +229,72 @@ box-shadow: 0px 2px 0px 0px rgba(0, 0, 0, 0.02);
 .sortName{
     color:antiquewhite
 }
+
+.userScreen{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 250px; /* Adjust the width as needed */
+    height: 100px; /* This will make it a square */
+
+}
+
+.signOut{
+    border-radius: 10px;
+    background: white;
+}
+
+.avatar{
+    margin-right: 10px;
+}
+
+.settingsForm{
+    display: flex;
+    flex-direction: column;
+    align-self: center;
+    justify-self: center;
+    padding: 10px;
+    border: solid 2px black;
+    border-radius: 5px;
+    padding: 50px;
+    background-color: #343541;
+}
+
+.box{
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 12px;
+    border-bottom:solid 2px black;
+    margin:5px;
+    justify-content: start;
+    align-items: center;
+    background-color: #D9D9D9;
+}
+
+.boxProp{
+    margin: 10px;
+}
+
+.userValue{
+    display:flex;
+    flex-direction: column;
+}
+
+.loginPopUp{
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    justify-self: center;
+
+}
+
+.popup-content{
+    display: flex;
+    justify-content: center;
+    background: #c92424;
+    border-radius: 20px;
+} 
+

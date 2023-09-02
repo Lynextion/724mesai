@@ -20,7 +20,7 @@ npm start &
 MIDDLEWARE_PID=$!
 
 # Navigate back to the React application directory
-cd path/to/your/react/app
+cd  ../frontend/
 
 # Start the React development server
 npm start

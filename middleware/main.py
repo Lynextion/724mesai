@@ -6,7 +6,7 @@ import csv
 import sys
 
 
-GPT_MODEL = "gpt-3.5-turbo-0613"
+GPT_MODEL = "gpt-4-0613"
 
 @retry(wait=wait_random_exponential(min=1, max=40), stop=stop_after_attempt(3))
 def chat_completion_request(messages,functions=None,function_call=None,model=GPT_MODEL):
@@ -38,33 +38,6 @@ def chat_completion_request(messages,functions=None,function_call=None,model=GPT
     
 
 
-def createFunction(companyInfo):
-
-    functions = [
-        {
-            "name":"Advisor",
-            "description":f"""You are a company helper at {companyInfo["companyName"]}.The sector of this company is {companyInfo["sector"]} Workers gonna ask questions about their job""",
-            "parameters":{
-                "type":"object",
-                "properties":{
-                    "advise":{
-                        "type":"string",
-                        "description":f"""
-                                    We are a company at {companyInfo["companyName"]}.
-                                    The sector of this company {companyInfo["sector"]}.
-                                    The questions generally about this sector {companyInfo["sector"]} so anwer the questions acording to this.
-                                    You are an adviser and helper for this company
-                                    Advise people who ask you something 
-                                    call this function everytime
-                                """
-                    }
-                },
-                "required":["advise"],
-            }
-        }
-    ]
-
-    return functions
 
 
 
@@ -87,17 +60,18 @@ if __name__ == "__main__":
 
 
 
-    function = createFunction(companyInfo)
-    respond = chat_completion_request(messages,function)
+   
+    respond = chat_completion_request(messages)
     assistantMessage = respond.json()["choices"][0]["message"]
 
 
     if(assistantMessage.get("function_call")):
         value = eval(assistantMessage["function_call"]["arguments"])["advise"]
+        data = {"role":"assistant","content":value}
         messages.append({"role":"assistant","content":"value"})
+        print(json.dumps(data))
 
     else:
         messages.append(assistantMessage)
-
-    print(json.dumps(assistantMessage))
+        print(json.dumps(assistantMessage))
    

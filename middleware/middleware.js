@@ -434,6 +434,33 @@ app.post("/addWorkerId", async (req,res) => {
   res.sendStatus(200)
 })
 
+app.post("/getAvatar",async (req,res) =>{
+  const id = req.body.body.id
+  const avatar = await db.getUserAvatar(id)
+
+  res.send(avatar)
+  
+})
+
+app.post("/updateUserData",async (req,res) =>{
+  const func = req.body.body.func
+
+  if(func === 'userName'){
+    await db.updateUserName(req.body.body)
+    res.send("Done")
+  }
+
+  if(func === 'role'){
+    await db.updateRole(req.body.body)
+    res.send("Done")
+  }
+
+  if(func === 'email'){
+    await db.updateEmail(req.body.body)
+    res.send("Done")
+  }
+
+})
 
 app.listen(port, () => {
     console.log(`App listening on port ${port}`)

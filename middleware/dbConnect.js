@@ -25,6 +25,14 @@ const client = new Client({
 client.connect()
 
 
+const getUserAvatar = async (userId) =>{
+
+    const avatar = await client.execute(`SELECT avatar_url FROM companies.woker WHERE id=${userId}`)
+    return avatar.first()
+
+}
+
+
 const createMessage = async (userId,userMessage) =>{
 
     try {
@@ -309,5 +317,19 @@ const addWorkerId = async (id,companyId) => {
     
 }
 
+const updateEmail = async(data) =>{
+    await client.execute(`UPDATE companies.woker SET email='${data.value}' WHERE id=${data.id};`)
 
-module.exports = {receiveMessage,addMessage,createMessage,findUser,findCompany,findUsers,addUser,updateUser,allMessage,deleteMessage,insertWhiteList,addFirebaseId,findUserwithEmail,findUserUID,getWhitelist,verifyUser,findCompanyByName,addWorkerId}
+}
+
+const updateUserName = async(data) =>{
+    await client.execute(`UPDATE companies.woker SET name='${data.value}' WHERE id=${data.id};`)
+
+}
+
+const updateRole = async(data) =>{
+    await client.execute(`UPDATE companies.woker SET role='${data.value}' WHERE id=${data.id}`)
+}
+
+
+module.exports = {receiveMessage,addMessage,createMessage,findUser,findCompany,findUsers,addUser,updateUser,allMessage,deleteMessage,insertWhiteList,addFirebaseId,findUserwithEmail,findUserUID,getWhitelist,verifyUser,findCompanyByName,addWorkerId,getUserAvatar,updateUserName,updateEmail,updateRole}
