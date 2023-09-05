@@ -270,11 +270,12 @@ box-shadow: 0px 2px 0px 0px rgba(0, 0, 0, 0.02);
     margin:5px;
     justify-content: start;
     align-items: center;
-    background-color: #D9D9D9;
+    background-color: #444654;
 }
 
 .boxProp{
     margin: 10px;
+    color:white
 }
 
 .userValue{
@@ -298,3 +299,46 @@ box-shadow: 0px 2px 0px 0px rgba(0, 0, 0, 0.02);
     border-radius: 20px;
 } 
 
+.updateValue{
+    display: flex;
+    width: 240px;
+    padding: 10px;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    border-radius: 15px;
+    background: #32333E;
+    border-color: #343541;
+    /* drop-shadow/button-secondary */
+    box-shadow: 0px 2px 0px 0px rgba(0, 0, 0, 0.02);
+}
+
+.submitText{
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    color: var(--neutral-5, #D9D9D9);
+    text-overflow: ellipsis;
+    
+    /* Body Small */
+    font-family: Segoe UI;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 16px; /* 114.286% */
+    pointer-events: none;
+}
+
+.newValue{
+    border-radius: 10px;
+    border-color: black;
+    padding: 5%;
+
+}
+
+.value-container{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}

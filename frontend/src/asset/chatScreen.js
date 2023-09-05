@@ -216,7 +216,7 @@ const ChatScreen = () =>{
     }
 
     const sentMessage = async ()  =>{
-        bottomScroll.current.scrollIntoView({behavior:'smooth'})
+        
 
         if(setActivate){
             const tempMessageId = currentMessageId
@@ -231,11 +231,12 @@ const ChatScreen = () =>{
                 setSend('')
                 console.log("body",body)
                 tempUpdateMessage(body.message,tempMessageId)
-
+                bottomScroll.current.scrollIntoView({behavior:'smooth'})
 
                 await axiosInstance.post("/message",{body}).then((response) => {
                     tempUpdateMessage(response.data,tempMessageId)
                 }).then(() => setActivate(true)).then(() => setDisabled(false))
+                bottomScroll.current.scrollIntoView({behavior:'smooth'})
             }
 
             else{
@@ -250,7 +251,7 @@ const ChatScreen = () =>{
                 }
                 console.log("body",body)
                 updateMessage(body.message)
-
+                bottomScroll.current.scrollIntoView({behavior:'smooth'})
 
                 await axiosInstance.post("/create-message",{body}).then((response) => {
                     updateMessage(JSON.parse(response.data.result))
@@ -259,6 +260,7 @@ const ChatScreen = () =>{
                 }).then(() => setActivate(true)).then(() => setDisabled(false))
                 callTopics()
                 setNewMessage(false)
+                bottomScroll.current.scrollIntoView({behavior:'smooth'})
             }
 
     }
@@ -336,9 +338,9 @@ const ChatScreen = () =>{
                 
             </div>
             <div className="chat">
-                <div className="messageContainer">
+                <div  ref={bottomScroll} className="messageContainer">
                     <Messages messages={message}/>
-                    <div ref={bottomScroll}></div>
+                    <div ></div>
                 </div>
                 <div className="command">
                     <Commands/>
