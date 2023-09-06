@@ -14,6 +14,7 @@ const UserScreen = ({signOut}) =>{
   
   const [userId,setUserId] = useState('')
   const [avatarName,setAvatarName] = useState('')
+  const [isAdmin,setIsAdmin] = useState(false)
   
   const axiosInstance = axios.create({
     baseURL:"http://localhost:4000",
@@ -38,6 +39,8 @@ const UserScreen = ({signOut}) =>{
       console.log("buneymiş gardai",parsed[0].id)
       setUserId(() => {return parsed[0].id})
       const id = parsed[0].id
+      setIsAdmin(parsed[0].isadmin)
+      console.log(parsed[0].isadmin)
       fetchAvatar(id)
   }
 
@@ -67,6 +70,15 @@ const UserScreen = ({signOut}) =>{
         icon: <img src={settings} width='16px' height='16px'/>,
       },
     ];
+
+    if(isAdmin){
+      items.push({
+        label: <button className='signOut' onClick={() => {navigate(`/${name}/admin`)}}>Admin Settings</button>,
+        key: '3',
+        icon: <UserOutlined />,
+      })
+    }
+
     const menuProps = {
       items,
       onClick: handleMenuClick,

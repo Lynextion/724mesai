@@ -1,17 +1,20 @@
 import "./adminPanel.css"
 import Logo from "./svg/altin-logo-w-1.png"
 import { useEffect, useRef, useState } from "react"
-import { generatePassword } from "./generate password"
-import { createUserWithEmailAndPassword,onAuthStateChanged } from "firebase/auth"
+import {onAuthStateChanged } from "firebase/auth"
 import {auth} from "../firebase"
 import axios from "axios"
 import robotWait from "./svg/robotWait.gif"
 import { useNavigate,useParams } from "react-router-dom"
 import CryptoJS from "crypto-js"
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const AdminPanel = () =>{
 
     const {name} = useParams()
+
+    const notify = (note) => toast(note);
 
     const ENCRYPTION_KEY = 'o7UZXkzXFp3iMbGpJqF3hbilW1tcwCxfBDDgVZXrmO4dLE62kYcawIVvS5EULxtE'
 
@@ -58,6 +61,7 @@ const AdminPanel = () =>{
         axiosInstance.post("/insert-whitelist",{body})
         .then(() =>{
             setWait(false)
+            notify("Done")
         })
     }
 
@@ -74,8 +78,45 @@ const AdminPanel = () =>{
         return(
             <>
                  <button className="addUserBT" onClick={userSumbit}><p className="btP">Kişi Ekle</p></button>
+                 <ToastContainer/>
             </>
         )
+    }
+
+    const updateCompanyBT = () =>{
+        return(
+            <>
+                 <button className="addUserBT" onClick={updateCompany}><p className="btP">Şirket Bilgilerini Güncelle</p></button>
+                 <ToastContainer/>
+            </>
+        )
+    }
+
+    const updateCompany = async () =>{
+        console.log(companyInfo.current.value)
+        if(companyInfo.current.value && companyName.current.value && companyRegion.current.value){
+
+            setWait(true)
+
+            const localData = localStorage.getItem("userData")
+            const decrypted = decryptData(localData,ENCRYPTION_KEY)
+            const temp = JSON.parse(decrypted)
+
+            const body = {
+                name:companyName.current.value,
+                sector:companyRegion.current.value,
+                companyinfo:companyInfo.current.value,
+                id:temp[0].companyid
+            }
+
+            await axiosInstance.post("/updateCompany",{body}).then(() =>{
+                setWait(false)
+                notify("Done")
+            })
+        }
+        else{
+            notify("Please fill the form")
+        }
     }
 
     const waitBT = () =>{
@@ -97,28 +138,33 @@ const AdminPanel = () =>{
     }
 
     const userSumbit= async () =>{
-        const Email = email.current.value
-        const Username = userName.current.value
-        const Role = userRol.current.value
-        const localData = localStorage.getItem("userData")
-        const decrypted = decryptData(localData,ENCRYPTION_KEY)
-        const temp = JSON.parse(decrypted)
 
-        const userInfo = {
-            "email":Email,
-            "companyId":temp[0].companyid,
-            "role":Role,
-            "Username":Username
+        if(email.current.value && userName.current.value && userRol.current.value){
+            const Email = email.current.value
+            const Username = userName.current.value
+            const Role = userRol.current.value
+            const localData = localStorage.getItem("userData")
+            const decrypted = decryptData(localData,ENCRYPTION_KEY)
+            const temp = JSON.parse(decrypted)
+            const userInfo = {
+                "email":Email,
+                "companyId":temp[0].companyid,
+                "role":Role,
+                "Username":Username
+            }
+
+
+            console.log(temp[0])
+            setWait(true)
+            const id = await addUser(userInfo)
+            
+            console.log('id idi dididi ',id)
+            addWorkerId(id,temp[0].companyid)
+            addWhiteList(Email,temp[0].companyid)
         }
-
-
-        console.log(temp[0])
-        setWait(true)
-        const id = await addUser(userInfo)
-        
-        console.log('id idi dididi ',id)
-        addWorkerId(id,temp[0].companyid)
-        addWhiteList(Email,temp[0].companyid)
+        else{
+            notify("Please fill the form")
+        }
               
     }
 
@@ -193,6 +239,8 @@ const findCompany = async() =>{
                     <input className="input" ref={companyName} placeholder="Şirket İsmi"/>
                     <input className="input" ref={companyRegion} placeholder="Şirket Sektörü"/>
                     <input className="input" ref={companyInfo} placeholder="Şirketin Kısaca Özeti"/>
+                    {!wait && updateCompanyBT()}
+                    {wait && waitBT()}
                 </div>
                 <div className="infoForm">
                     <h1 className="formInfo">Kişiler</h1>

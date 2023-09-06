@@ -241,11 +241,6 @@ const findCompanyByName = async (name) =>{
    
 }
 
-const updateCompany = async(companyInfo) =>{
-    
-
-    await client.execute(`UPDATE companies.company SET name`)
-}
 
 const updateUser = async(userInfo) =>{
     
@@ -331,5 +326,13 @@ const updateRole = async(data) =>{
     await client.execute(`UPDATE companies.woker SET role='${data.value}' WHERE id=${data.id}`)
 }
 
+const updateCompany = async(companyInfo) =>{
+    
 
-module.exports = {receiveMessage,addMessage,createMessage,findUser,findCompany,findUsers,addUser,updateUser,allMessage,deleteMessage,insertWhiteList,addFirebaseId,findUserwithEmail,findUserUID,getWhitelist,verifyUser,findCompanyByName,addWorkerId,getUserAvatar,updateUserName,updateEmail,updateRole}
+    await client.execute(`UPDATE companies.company SET name='${companyInfo.name}'  WHERE ID=${companyInfo.id};`)
+    await client.execute(`UPDATE companies.company SET sector='${companyInfo.sector}' WHERE ID=${companyInfo.id};`)
+    await client.execute(`UPDATE companies.company SET companyinfo='${companyInfo.companyinfo}' WHERE ID=${companyInfo.id}`)
+}
+
+
+module.exports = {receiveMessage,addMessage,createMessage,findUser,findCompany,findUsers,addUser,updateUser,allMessage,deleteMessage,insertWhiteList,addFirebaseId,findUserwithEmail,findUserUID,getWhitelist,verifyUser,findCompanyByName,addWorkerId,getUserAvatar,updateUserName,updateEmail,updateRole,updateCompany}

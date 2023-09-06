@@ -462,6 +462,12 @@ app.post("/updateUserData",async (req,res) =>{
 
 })
 
+app.post("/updateCompany", async (req,res) =>{
+  console.log(req.body.body)
+  await db.updateCompany(req.body.body)
+  res.send("Done")
+})
+
 app.listen(port, () => {
     console.log(`App listening on port ${port}`)
 })

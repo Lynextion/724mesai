@@ -50,6 +50,7 @@ const ChatScreen = () =>{
     const userInfo = tempInfo[0]
     const tempuserId = userInfo.id
     const [userId,setUserId] = useState(tempuserId)
+   
 
     const navigate = useNavigate()
 
