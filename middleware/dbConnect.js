@@ -334,5 +334,15 @@ const updateCompany = async(companyInfo) =>{
     await client.execute(`UPDATE companies.company SET companyinfo='${companyInfo.companyinfo}' WHERE ID=${companyInfo.id}`)
 }
 
+const createTask = async(task) => {
 
-module.exports = {receiveMessage,addMessage,createMessage,findUser,findCompany,findUsers,addUser,updateUser,allMessage,deleteMessage,insertWhiteList,addFirebaseId,findUserwithEmail,findUserUID,getWhitelist,verifyUser,findCompanyByName,addWorkerId,getUserAvatar,updateUserName,updateEmail,updateRole,updateCompany}
+   
+
+    const id = uuidv4()
+    await client.execute(`INSERT INTO companies.userTasks (id,tasks) VALUES (${id},['${task}']);`)
+    await client.execute(`UPDATE companies.company SET  tasks=tasks + [${id}];`)
+    
+}
+
+
+module.exports = {receiveMessage,addMessage,createMessage,findUser,findCompany,findUsers,addUser,updateUser,allMessage,deleteMessage,insertWhiteList,addFirebaseId,findUserwithEmail,findUserUID,getWhitelist,verifyUser,findCompanyByName,addWorkerId,getUserAvatar,updateUserName,updateEmail,updateRole,updateCompany,createTask}

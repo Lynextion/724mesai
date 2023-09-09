@@ -4,6 +4,7 @@ from tenacity import retry,wait_random_exponential,stop_after_attempt
 from termcolor import colored
 import csv
 import sys
+import js2py
 
 
 GPT_MODEL = "gpt-4-0613"
@@ -38,6 +39,27 @@ def chat_completion_request(messages,functions=None,function_call=None,model=GPT
     
 
 
+functions = [
+ {
+        "name": "create_task",
+        "description": "Create a task",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "Name of the task according to input",
+                },
+                "task_description": {
+                    "type": "string",
+                    "description": "Description of the task.",
+                },
+            },
+            "required": ["name", "task_description"],
+        },
+    },
+        
+]
 
 
 
@@ -53,7 +75,7 @@ if __name__ == "__main__":
     companyInfo = data["companyInfo"]
     userInfo = data["userInfo"]
 
-    messages = [{"role":"system","content":"The user name is "+userInfo["userName"]+". His/Her role in the company is "+userInfo["role"]+". So your answer must be accirding to these."}]
+    messages = [{"role":"system","content":"The user name is "+userInfo["userName"]+". His/Her role in the company is "+userInfo["role"]+". So your answer must be accirding to these.The name of the company user working currently is"+companyInfo["companyName"]+".The sector of the company is"+companyInfo["sector"]+".Lastly little info about the company"+companyInfo["companyInfo"]+"."}]
 
     for i in messageInfo["message"]:
         messages.append(i)
@@ -61,15 +83,18 @@ if __name__ == "__main__":
 
 
    
-    respond = chat_completion_request(messages)
+    respond = chat_completion_request(messages,functions=functions)
     assistantMessage = respond.json()["choices"][0]["message"]
 
 
     if(assistantMessage.get("function_call")):
-        value = eval(assistantMessage["function_call"]["arguments"])["advise"]
-        data = {"role":"assistant","content":value}
-        messages.append({"role":"assistant","content":"value"})
-        print(json.dumps(data))
+        task_name = eval(assistantMessage["function_call"]["arguments"])["name"]
+        task_description = eval(assistantMessage["function_call"]["arguments"])["task_description"]
+        data = {"task_name":task_name,"task_description":task_description}
+        messages.append({"role":"assistant","content":task_name})
+        with open("./testi.txt",'a') as file:
+            file.write(str(data))
+        print(json.dumps({"role":"assistant","content":"The task created as "+task_name}))
 
     else:
         messages.append(assistantMessage)

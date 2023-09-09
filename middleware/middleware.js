@@ -95,11 +95,13 @@ app.post("/message", async (req,res) => {
     "companyInfo":{
       "companyName":companyInfo.name,
       "companyId":companyInfo.id,
-      "sector":companyInfo.sector
+      "sector":companyInfo.sector,
+      "companyInfo":companyInfo.companyinfo
     }
 
   }
 
+  console.log("companyinfo",messages.companyInfo)
 
 
  //Python için arguments eklenecek
@@ -141,7 +143,8 @@ execFile('python3', [pythonScriptPath, JSON.stringify(messages)],(error,stdout,s
     "companyInfo":{
       "companyName":companyInfo.name,
       "companyId":companyInfo.id,
-      "sector":companyInfo.sector
+      "sector":companyInfo.sector,
+      "companyInfo":companyInfo.companyinfo
     }
 
   }
@@ -187,7 +190,8 @@ app.post("/create-message", async (req,res) =>{
       "companyInfo":{
         "companyName":companyInfo.name,
         "companyId":companyInfo.id,
-        "sector":companyInfo.sector
+        "sector":companyInfo.sector,
+        "companyInfo":companyInfo.companyinfo
       }
 
     }
@@ -205,6 +209,9 @@ app.post("/create-message", async (req,res) =>{
  // Capture the output of the Python process
  execFile('python3', [pythonScriptPath, JSON.stringify(messages)],(error,stdout,stderr) => {
    // Append the received data to the result variable
+
+   if(!error){
+
    result += stdout;
    console.log("stdd ",result)
    data = result
@@ -229,7 +236,8 @@ app.post("/create-message", async (req,res) =>{
      "companyInfo":{
        "companyName":companyInfo.name,
        "companyId":companyInfo.id,
-       "sector":companyInfo.sector
+       "sector":companyInfo.sector,
+       "companyInfo":companyInfo.companyinfo
      }
  
    }
@@ -240,6 +248,10 @@ app.post("/create-message", async (req,res) =>{
     messageId:updatedMessages.messageInfo.messageId
    }
    res.send(sendedData); 
+  }
+  else(
+    console.log(error)
+  )
    
  });
 
