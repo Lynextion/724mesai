@@ -4,7 +4,7 @@ from tenacity import retry,wait_random_exponential,stop_after_attempt
 from termcolor import colored
 import csv
 import sys
-import js2py
+
 
 
 GPT_MODEL = "gpt-4-0613"
@@ -94,9 +94,15 @@ if __name__ == "__main__":
         messages.append({"role":"assistant","content":task_name})
         with open("./testi.txt",'a') as file:
             file.write(str(data))
-        print(json.dumps({"role":"assistant","content":"The task created as "+task_name}))
+        print(json.dumps({"role":"assistant","content":"The task created as "+task_name,"taskCreated":"yes","task":data}))
 
     else:
         messages.append(assistantMessage)
-        print(json.dumps(assistantMessage))
+        data = {
+            "role":assistantMessage["role"],
+            "content":assistantMessage["content"],
+            "taskCreated":"no"
+        }
+
+        print(json.dumps(data))
    

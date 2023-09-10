@@ -111,7 +111,7 @@ app.post("/message", async (req,res) => {
   let result = ''; // Store the result from the Python script
 
 // Capture the output of the Python process
-execFile('python3', [pythonScriptPath, JSON.stringify(messages)],(error,stdout,stderr) => {
+execFile('python3', [pythonScriptPath, JSON.stringify(messages)], async (error,stdout,stderr) => {
   // Append the received data to the result variable
 
   if(error){
@@ -121,7 +121,16 @@ execFile('python3', [pythonScriptPath, JSON.stringify(messages)],(error,stdout,s
 
   result += stdout;
   console.log("resil;t",result)
-  data = result
+  tempData = JSON.parse(result)
+  data = {
+    "role":tempData.role,
+    "content":tempData.content
+  }
+
+  if(tempData.taskCreated === "yes"){
+    await db.createTask(tempData.task,userId)
+  }
+
   const updatedMessages = {
     "userInfo":{
 
@@ -134,7 +143,7 @@ execFile('python3', [pythonScriptPath, JSON.stringify(messages)],(error,stdout,s
 
     "messageInfo":{
       "messageId":messageInfo.messageid,
-      "message":[userMessaage,JSON.parse(data)],
+      "message":[userMessaage,data],
       "topic":messageInfo.topic,
       "date":messageInfo.date
       
@@ -207,14 +216,24 @@ app.post("/create-message", async (req,res) =>{
    let result = ''; // Store the result from the Python script
  
  // Capture the output of the Python process
- execFile('python3', [pythonScriptPath, JSON.stringify(messages)],(error,stdout,stderr) => {
+ execFile('python3', [pythonScriptPath, JSON.stringify(messages)],async (error,stdout,stderr) => {
    // Append the received data to the result variable
 
    if(!error){
 
    result += stdout;
    console.log("stdd ",result)
-   data = result
+   tempData = JSON.parse(result)
+   data = {
+     "role":tempData.role,
+     "content":tempData.content
+   }
+
+   if(tempData.taskCreated === "yes"){
+    await db.createTask(tempData.task,userId)
+  }
+
+
    const updatedMessages = {
      "userInfo":{
  
@@ -227,7 +246,7 @@ app.post("/create-message", async (req,res) =>{
  
      "messageInfo":{
        "messageId":messageInfo.messageid,
-       "message":[JSON.parse(result)],
+       "message":[data],
        "topic":messageInfo.topic,
        "date":messageInfo.date
        

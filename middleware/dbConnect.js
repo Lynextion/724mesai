@@ -334,13 +334,13 @@ const updateCompany = async(companyInfo) =>{
     await client.execute(`UPDATE companies.company SET companyinfo='${companyInfo.companyinfo}' WHERE ID=${companyInfo.id}`)
 }
 
-const createTask = async(task) => {
+const createTask = async(task,userId) => {
 
    
 
     const id = uuidv4()
-    await client.execute(`INSERT INTO companies.userTasks (id,tasks) VALUES (${id},['${task}']);`)
-    await client.execute(`UPDATE companies.company SET  tasks=tasks + [${id}];`)
+    await client.execute(`INSERT INTO companies.Tasks (id,tasks) VALUES (${id},'${JSON.stringify(task)}');`)
+    await client.execute(`UPDATE companies.woker SET  tasks=tasks + [${id}] WHERE id=${userId} ;`)
     
 }
 
