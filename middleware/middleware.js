@@ -131,6 +131,15 @@ execFile('python3', [pythonScriptPath, JSON.stringify(messages)], async (error,s
     await db.createTask(tempData.task,userId)
   }
 
+  if(tempData.taskCalled === "yes"){
+    const tasks = await db.showTasks(userId)
+    const messagedata = JSON.parse(tasks.tasks)
+    const message = {"role":"assistant","content":`The current task are ${messagedata.task_name} `} 
+    data.content = messagedata.task_name
+    result = message
+  }
+  
+
   const updatedMessages = {
     "userInfo":{
 
@@ -231,6 +240,14 @@ app.post("/create-message", async (req,res) =>{
 
    if(tempData.taskCreated === "yes"){
     await db.createTask(tempData.task,userId)
+  }
+
+  if(tempData.taskCalled === "yes"){
+    const tasks = await db.showTasks(userId)
+    const messagedata = JSON.parse(tasks.tasks)
+    const message = {"role":"assistant","content":`The current task are ${messagedata.task_name} `} 
+    data.content = messagedata.task_name
+    result = message
   }
 
 
@@ -498,6 +515,7 @@ app.post("/updateCompany", async (req,res) =>{
   await db.updateCompany(req.body.body)
   res.send("Done")
 })
+
 
 app.listen(port, () => {
     console.log(`App listening on port ${port}`)

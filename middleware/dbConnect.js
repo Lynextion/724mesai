@@ -339,10 +339,15 @@ const createTask = async(task,userId) => {
    
 
     const id = uuidv4()
-    await client.execute(`INSERT INTO companies.Tasks (id,tasks) VALUES (${id},'${JSON.stringify(task)}');`)
+    await client.execute(`INSERT INTO companies.Tasks (id,userid,tasks) VALUES (${id},${userId},'${JSON.stringify(task)}');`)
     await client.execute(`UPDATE companies.woker SET  tasks=tasks + [${id}] WHERE id=${userId} ;`)
     
 }
 
+const showTasks = async(userId) => {
+    const tasks = await client.execute(`SELECT tasks FROM companies.tasks WHERE userid=${userId};`)
+    return tasks.first()
+}
 
-module.exports = {receiveMessage,addMessage,createMessage,findUser,findCompany,findUsers,addUser,updateUser,allMessage,deleteMessage,insertWhiteList,addFirebaseId,findUserwithEmail,findUserUID,getWhitelist,verifyUser,findCompanyByName,addWorkerId,getUserAvatar,updateUserName,updateEmail,updateRole,updateCompany,createTask}
+
+module.exports = {receiveMessage,addMessage,createMessage,findUser,findCompany,findUsers,addUser,updateUser,allMessage,deleteMessage,insertWhiteList,addFirebaseId,findUserwithEmail,findUserUID,getWhitelist,verifyUser,findCompanyByName,addWorkerId,getUserAvatar,updateUserName,updateEmail,updateRole,updateCompany,createTask,showTasks}

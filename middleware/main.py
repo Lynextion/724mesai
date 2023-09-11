@@ -37,7 +37,7 @@ def chat_completion_request(messages,functions=None,function_call=None,model=GPT
         print(f"Exception: {e}")
         return e
     
-
+functions_list = ['name','task_description','showTask']
 
 functions = [
  {
@@ -56,6 +56,21 @@ functions = [
                 },
             },
             "required": ["name", "task_description"],
+        },
+    },
+    {
+        "name": "show_task",
+        "description": "showing current tasks",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "showTask": {
+                    "type": "string",
+                    "description": "when this function called the output must be 'show_tasks'",
+                },
+               
+            },
+            "required": ["name",],
         },
     },
         
@@ -88,20 +103,31 @@ if __name__ == "__main__":
 
 
     if(assistantMessage.get("function_call")):
-        task_name = eval(assistantMessage["function_call"]["arguments"])["name"]
-        task_description = eval(assistantMessage["function_call"]["arguments"])["task_description"]
-        data = {"task_name":task_name,"task_description":task_description}
-        messages.append({"role":"assistant","content":task_name})
-        with open("./testi.txt",'a') as file:
-            file.write(str(data))
-        print(json.dumps({"role":"assistant","content":"The task created as "+task_name,"taskCreated":"yes","task":data}))
+        if(assistantMessage["function_call"]["name"] == "create_task"):
+            task_name = eval(assistantMessage["function_call"]["arguments"])["name"]
+            task_description = eval(assistantMessage["function_call"]["arguments"])["task_description"]
+            data = {"task_name":task_name,"task_description":task_description}
+            messages.append({"role":"assistant","content":task_name})
+
+            with open("./testi.txt",'a') as file:
+                file.write(str(data))
+            print(json.dumps({"role":"assistant","content":"The task created as "+task_name,"taskCreated":"yes","task":data}))
+
+        if(assistantMessage["function_call"]["name"] == "show_task"):
+             task_name = eval(assistantMessage["function_call"]["arguments"])["showTask"]
+             with open("./testi.txt",'a') as file:
+                file.write(str(assistantMessage["function_call"]))
+            
+             print(json.dumps({"role":"assistant","content":"The task will be showed ","taskCreated":"no","taskCalled":"yes"}))
 
     else:
         messages.append(assistantMessage)
         data = {
             "role":assistantMessage["role"],
             "content":assistantMessage["content"],
-            "taskCreated":"no"
+            "taskCreated":"no",
+            "taskCalled":"no"
+
         }
 
         print(json.dumps(data))
