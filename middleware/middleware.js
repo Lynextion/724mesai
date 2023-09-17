@@ -132,10 +132,10 @@ execFile('python3', [pythonScriptPath, JSON.stringify(messages)], async (error,s
   }
 
   if(tempData.taskCalled === "yes"){
-    const tasks = await db.showTasks(userId)
-    const messagedata = JSON.parse(tasks.tasks)
-    const message = {"role":"assistant","content":`The current task are ${messagedata.task_name} `} 
-    data.content = messagedata.task_name
+    const task = await db.showTasks(userId)
+    console.log(task[0].tasks)
+    const message = {"role":"assistant","content":`The current task are ${JSON.parse(task[1].tasks).task_name} `} 
+    data.content = JSON.parse(task[1].tasks).task_name
     result = message
   }
   
@@ -243,11 +243,11 @@ app.post("/create-message", async (req,res) =>{
   }
 
   if(tempData.taskCalled === "yes"){
-    const tasks = await db.showTasks(userId)
-    const messagedata = JSON.parse(tasks.tasks)
-    const message = {"role":"assistant","content":`The current task are ${messagedata.task_name} `} 
-    data.content = messagedata.task_name
-    result = message
+    const task = await db.showTasks(userId)
+    console.log(task[0].tasks)
+    const message = {"role":"assistant","content":`The current task are ${JSON.parse(task[1].tasks).task_name} `} 
+    data.content = JSON.parse(task[1].tasks).task_name
+    result = messagee
   }
 
 
@@ -342,6 +342,12 @@ app.post("/collect-message", async (req,res) => {
   
   res.send(updatedData)
 
+})
+
+app.post("/collect-tasks",async(req,res) =>{
+  const userId = req.body.body.userId
+  const tasks = await db.showTasks(userId)
+  res.send(JSON.parse(tasks))
 })
 
 
@@ -514,6 +520,15 @@ app.post("/updateCompany", async (req,res) =>{
   console.log(req.body.body)
   await db.updateCompany(req.body.body)
   res.send("Done")
+})
+
+app.post("/showTasks", async (req,res) =>{
+    const userId = req.body.body.userId
+    console.log("userrrrrr",userId)
+    const data = await db.showTasks(userId)
+    const sortedData = data.map((data) =>{return JSON.parse(data.tasks)})
+    console.log(sortedData)
+    res.send(sortedData)
 })
 
 

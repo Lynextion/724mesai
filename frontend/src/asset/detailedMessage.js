@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { dracula } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import ReactMarkdown from 'react-markdown';
+
+
 
 function identifyCodeBlocks(text) {
   const codeBlockRegex = /```([\s\S]*?)```/g;
@@ -39,11 +42,12 @@ function identifyCodeBlocks(text) {
 function TextWithCodeBlocks({ text }) {
   const codeBlocks = identifyCodeBlocks(text);
 
+
   return (
     <div>
       {codeBlocks.map((block, index) =>
         block.type === 'text' ? (
-          <span className="topicText" key={index}>{block.content}</span>
+          <span className="topicText" key={index}><ReactMarkdown key={index}>{block.content}</ReactMarkdown></span>
         ) : (
           <SyntaxHighlighter
             key={index}

@@ -13,6 +13,7 @@ import {auth} from '../firebase';
 import { useNavigate, useParams } from 'react-router-dom';
 import CryptoJS from 'crypto-js'
 import UserScreen from "./userScreen"
+import UserTasks from "./userTasks"
 
 
 const ChatScreen = () =>{
@@ -32,7 +33,7 @@ const ChatScreen = () =>{
         return decryptedData
     }
     
-    
+    const [tasks,setTasks] = useState('')
     const [collected,setCollected] = useState(false)
     const [messageInfo,setMessageInfo] = useState([{}])
     let [allMessage, setAllMessage] = useState([{}])
@@ -70,6 +71,7 @@ const ChatScreen = () =>{
 
              
               console.log("userInfo ", userId)
+              getTask()
               callTopics()
               
             } else {
@@ -99,6 +101,7 @@ const ChatScreen = () =>{
             const data = {"userId": userId}
             console.log(data)
             axiosInstance.post("/all-message",{data}).then((response) => {scrapTopics(response.data)})
+            
         }
         catch(err){
             return(<>
@@ -176,10 +179,16 @@ const ChatScreen = () =>{
         }
     }
 
+    const getTask = async () =>{
+        const body = {
+            userId:userId
+        }
+        await axiosInstance.post("/showTasks",{body}).then((result) =>{setTasks(result.data)})
+    }
+
+
     useEffect(() =>{
         findCompany()
-
-
         
     },[])
 
@@ -335,6 +344,7 @@ const ChatScreen = () =>{
                     {collected && renderTopics()}
                 </div>
                 )}
+                <UserTasks userId={tempuserId} tasks={tasks} />
                 <UserScreen signOut={handleLogout.bind(this)}/>
                 
             </div>

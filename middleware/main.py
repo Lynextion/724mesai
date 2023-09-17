@@ -4,6 +4,7 @@ from tenacity import retry,wait_random_exponential,stop_after_attempt
 from termcolor import colored
 import csv
 import sys
+import requests
 
 
 
@@ -54,6 +55,11 @@ functions = [
                     "type": "string",
                     "description": "Description of the task.",
                 },
+                "task_date": {
+                    "type": "string",
+                    "description": "if date given your output must be a formal date format as dd.mm.yy.If date is not given output must be 'no date''",
+                },
+                
             },
             "required": ["name", "task_description"],
         },
@@ -70,11 +76,21 @@ functions = [
                 },
                
             },
-            "required": ["name",],
+            "required": ["showTask",],
         },
     },
+    
         
 ]
+
+def current_date():
+    city = 'istanbul'
+    api_url = 'https://api.api-ninjas.com/v1/worldtime?city={}'.format(city)
+    response = requests.get(api_url, headers={'X-Api-Key': 'h4E8qC56XIu4y3NmnblKQA==tHKXzyVGsZa9D3GX'})
+    if response.status_code == requests.codes.ok:
+        return response.text
+    else:
+        return "no date"
 
 
 
@@ -90,7 +106,7 @@ if __name__ == "__main__":
     companyInfo = data["companyInfo"]
     userInfo = data["userInfo"]
 
-    messages = [{"role":"system","content":"The user name is "+userInfo["userName"]+". His/Her role in the company is "+userInfo["role"]+". So your answer must be accirding to these.The name of the company user working currently is"+companyInfo["companyName"]+".The sector of the company is"+companyInfo["sector"]+".Lastly little info about the company"+companyInfo["companyInfo"]+"."}]
+    messages = [{"role":"system","content":"The user name is "+userInfo["userName"]+". His/Her role in the company is "+userInfo["role"]+". So your answer must be accirding to these.The name of the company user working currently is"+companyInfo["companyName"]+".The sector of the company is"+companyInfo["sector"]+".Lastly little info about the company"+companyInfo["companyInfo"]+". Your answers must bu in language according to last input.Current date is" + current_date() +"."}]
 
     for i in messageInfo["message"]:
         messages.append(i)
@@ -106,7 +122,8 @@ if __name__ == "__main__":
         if(assistantMessage["function_call"]["name"] == "create_task"):
             task_name = eval(assistantMessage["function_call"]["arguments"])["name"]
             task_description = eval(assistantMessage["function_call"]["arguments"])["task_description"]
-            data = {"task_name":task_name,"task_description":task_description}
+            task_date = eval(assistantMessage["function_call"]["arguments"])["task_date"]
+            data = {"task_name":task_name,"task_description":task_description,"task_date":task_date}
             messages.append({"role":"assistant","content":task_name})
 
             with open("./testi.txt",'a') as file:
