@@ -9,6 +9,7 @@ import { useNavigate,useParams } from "react-router-dom"
 import CryptoJS from "crypto-js"
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import UsersList from "./usersList"
 
 const AdminPanel = () =>{
 
@@ -30,7 +31,7 @@ const AdminPanel = () =>{
         return decryptedData
     }
 
-    const [tempId,setTempId] = useState()
+    
 
     const companyName = useRef(null)
     const companyRegion = useRef(null)
@@ -39,6 +40,12 @@ const AdminPanel = () =>{
     const userName = useRef(null)
     const userRol = useRef(null)
     const email = useRef(null)
+
+    const localData = localStorage.getItem("userData")
+    const decrypted = decryptData(localData,ENCRYPTION_KEY)
+    const temp = JSON.parse(decrypted)
+
+    const [companyId,setCompanyId] = useState(temp[0].companyid)
 
     const navigate = useNavigate()
     
@@ -206,12 +213,13 @@ const AdminPanel = () =>{
 
 const findCompany = async() =>{
 
+
     const body ={
         name:name
     }
 
     const companyInfo = await axiosInstance.post("/findCompanyByName",{body}).then((response) => {return response.data})
-    console.log(companyInfo)
+    console.log(companyInfo[0].id)
     if(companyInfo === "No Company Found"){
         navigate(`/${name}/`)
         console.log("noooy")
@@ -231,7 +239,7 @@ const findCompany = async() =>{
     return(
         <div className="panelBody">
             <div className="panelHeader">
-                <img src={Logo}/>
+                <img src={Logo} />
             </div>
             <div className="forms">
                 <div className="infoForm">
@@ -250,6 +258,7 @@ const findCompany = async() =>{
                     {!wait && userAddBT()}
                     {wait && waitBT()}
                 </div>
+                <UsersList companyId={companyId}/>
             </div>
         </div>
     )

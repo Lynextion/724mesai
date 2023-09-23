@@ -166,7 +166,7 @@ const findUsers = async (companyId) =>{
         const userInfo = await client.execute(`SELECT * FROM companies.woker WHERE companyid=${companyId};`)
 
 
-        return userInfo.first()
+        return userInfo.rows
     }
     catch(err){
         return err

@@ -1,8 +1,7 @@
-import { irBlack } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import "./chatScreen.css"
 import {Collapse, ConfigProvider} from "antd"
 import { useEffect, useState } from "react";
-import axios from 'axios'
+
 
 const UserTasks = ({tasks}) =>{
     
@@ -11,10 +10,13 @@ const UserTasks = ({tasks}) =>{
     const items= [
       {
         key: '1',
-        label: 'This is panel header 1',
+        label: <p style={{color:'white'}}>Tasklar</p>,
         children: tasks.map((data,key) =>{
-            return (<div className="tasks">
-                    <p>Task Name: {data.task_name}</p>
+            return (<div key={key} className="tasks">
+                    <p >Task Name: {data.task_name}</p>
+                    <p>Task Description:{data.task_description}</p>
+                    <p>Task Date:{data.task_date}</p>
+                   
             </div>)
         })
       },
@@ -35,7 +37,7 @@ const UserTasks = ({tasks}) =>{
                    
                 }}      
             >
-                <Collapse items={items} defaultActiveKey={['1']} />;
+                <Collapse items={items}  ghost showArrow={false} />;
             </ConfigProvider>
 
         </div>

@@ -353,9 +353,10 @@ app.post("/collect-tasks",async(req,res) =>{
 
 app.post("/collect-users", async(req,res) =>{
   
-  const companyId = req.body.companyId
-
-  const userInfo = db.findUsers(companyId);
+  const companyId = req.body.body.companyId
+  console.log("companyidd",companyId)
+  const userInfo = await db.findUsers(companyId);
+  console.log("useerss",userInfo)
 
   res.send(userInfo)
 

@@ -341,3 +341,15 @@ box-shadow: 0px 2px 0px 0px rgba(0, 0, 0, 0.02);
     flex-direction: row;
     justify-content: center;
 }
+
+.tasks{
+    background-color: rgb(218, 213, 213);
+    border-radius: 20px;
+    
+}
+
+.TaskBody{
+    display: flex;
+    width: 100%;
+    
+}
