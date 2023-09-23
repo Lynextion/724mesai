@@ -149,6 +149,7 @@ const AdminPanel = () =>{
         if(email.current.value && userName.current.value && userRol.current.value){
             const Email = email.current.value
             const Username = userName.current.value
+            console.log(Username)
             const Role = userRol.current.value
             const localData = localStorage.getItem("userData")
             const decrypted = decryptData(localData,ENCRYPTION_KEY)

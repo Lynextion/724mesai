@@ -184,7 +184,7 @@ const addUser = async(userInfo,id) => {
         
         
 
-        await client.execute(`INSERT INTO companies.woker (id,name,role,companyid,email,verified) VALUES (${id},'${userInfo.userName}','${userInfo.role}',${userInfo.companyId},'${userInfo.email}',False);`)
+        await client.execute(`INSERT INTO companies.woker (id,name,role,companyid,email,verified,isAdmin) VALUES (${id},'${userInfo.Username}','${userInfo.role}',${userInfo.companyId},'${userInfo.email}',False,False);`)
        
     }
     catch(err){

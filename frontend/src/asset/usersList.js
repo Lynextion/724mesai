@@ -31,8 +31,8 @@ const Paneller = ({companyId}) => {
 
     await axiosInstance.post("/collect-users",{body}).then((result) =>{
       result.data.map((info,key)=>{
-        console.log({key:key,name:info.name,id:info.id,isAdmin:info.isAdmin,email:info.email,role:[info.role]})
-        setData( (previous) => { return ( [...previous,{key:key,name:info.name,id:info.id,isAdmin:info.isAdmin,email:info.email,role:[info.role]}])})
+        console.log({key:key,name:info.name,id:info.id,isAdmin:info.isadmin,email:info.email,role:[info.role]})
+        setData( (previous) => { return ( [...previous,{key:key,name:info.name,id:info.id,isAdmin:String(info.isadmin),email:info.email,role:[info.role]}])})
       })
     })
 

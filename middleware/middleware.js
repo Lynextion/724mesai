@@ -365,7 +365,7 @@ app.post("/collect-users", async(req,res) =>{
 
 app.post("/add-user", async (req,res) => {
   const userInfo = {
-    userName:req.body.body.userName,
+    Username:req.body.body.Username,
     companyId:req.body.body.companyId,
     role:req.body.body.role,
     email:req.body.body.email
