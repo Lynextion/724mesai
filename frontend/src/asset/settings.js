@@ -9,6 +9,7 @@ import 'reactjs-popup/dist/index.css';
 import robotWait from "./svg/robotWait.gif"
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import UploadIMG from "./uploadImg"
 
 
 const Settings = () =>{
@@ -471,12 +472,12 @@ const Settings = () =>{
     },[])
 
     return(
-        <div className='body'  style={{display:'flex',alignItems:'center',width:'100%',justifyContent:'center',height: "100vh",overflowY:"scroll"}}>
+        <div className='body'  style={{display:'flex',alignItems:'center',width:'100%',justifyContent:'center',height: "100%",overflowY:"visible"}}>
             <div className='settingsForm'>
               <div className='box'>
-                  <img src={'https://res.cloudinary.com/dev724mesai/image/upload/f_auto,q_auto/'+avatarName}/>
+                  <img src={'https://res.cloudinary.com/dev724mesai/image/upload/f_auto,q_auto/'+"Standart-avatar"}/>
                   <p>Update Profile İmage</p>
-                  <input type='file' accept='image/*'/>
+                  <UploadIMG/>
               </div>
               <div className='box'>
                 <span className="boxProp">User Name</span>

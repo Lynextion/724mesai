@@ -283,6 +283,10 @@ const deleteMessage = async(messageInfo) =>{
     }
 }
 
+const deleteUser = async (userId) =>{
+    await client.execute(`DELETE from companies.woker WHERE id=${userId};`)
+}
+
 
 const insertWhiteList = async(data) =>{
     
@@ -364,4 +368,4 @@ const showTasks = async(userId) => {
 }
 
 
-module.exports = {receiveMessage,addMessage,createMessage,findUser,findCompany,findUsers,addUser,updateUser,allMessage,deleteMessage,insertWhiteList,addFirebaseId,findUserwithEmail,findUserUID,getWhitelist,verifyUser,findCompanyByName,addWorkerId,getUserAvatar,updateUserName,updateEmail,updateRole,updateCompany,createTask,showTasks}
+module.exports = {receiveMessage,addMessage,createMessage,findUser,findCompany,findUsers,addUser,updateUser,allMessage,deleteMessage,insertWhiteList,addFirebaseId,findUserwithEmail,findUserUID,getWhitelist,verifyUser,findCompanyByName,addWorkerId,getUserAvatar,updateUserName,updateEmail,updateRole,updateCompany,createTask,showTasks,deleteUser}

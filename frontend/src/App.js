@@ -5,14 +5,14 @@ import RegisterScreen from "./asset/registerScreen"
 import Panel from "./asset/adminPanel"
 import Settings from "./asset/settings"
 import {BrowserRouter, Routes, Route} from "react-router-dom";
-
+import Logo from "./asset/svg/altin-logo-w-1.png"
 
 function App() {
 
 
   return (
     <BrowserRouter>
-      <div className="App">
+        <div className="App" style={{background:'#444654'}}>
       <Routes>
       
         <Route path="/:name/" element={<LoginScreen/>}></Route>

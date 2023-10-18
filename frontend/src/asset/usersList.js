@@ -32,12 +32,24 @@ const Paneller = ({companyId}) => {
     await axiosInstance.post("/collect-users",{body}).then((result) =>{
       result.data.map((info,key)=>{
         console.log({key:key,name:info.name,id:info.id,isAdmin:info.isadmin,email:info.email,role:[info.role]})
-        setData( (previous) => { return ( [...previous,{key:key,name:info.name,id:info.id,isAdmin:String(info.isadmin),email:info.email,role:[info.role]}])})
+        setData( (previous) => { return ( [{key:key,name:info.name,id:info.id,isAdmin:String(info.isadmin),email:info.email,role:[info.role]}])})
       })
     })
 
   }
   
+  const deleteUser = async (userId) =>{
+    const body = {
+      userId:userId
+    }
+    console.log(body)
+
+    await axiosInstance.post("/removeUser",{body}).then((result) =>{
+      console.log(result.data)
+      collectUsers()
+    })
+
+  }
 
 
 
@@ -211,9 +223,9 @@ const Paneller = ({companyId}) => {
       dataIndex:'ayarlar',
       render: (text,record) =>(
         <Space size="small">
-          <Button onClick={(e) => {console.log(record.name)}}>AktifLeştir</Button>
-          <Button onClick={(e) => {console.log(record.name)}}>Pasifleştir</Button>
-          <Button onClick={(e) => {console.log(record.name)}}>Deaktive et</Button>
+          <Button onClick={(e) => {console.log(record.id)}}>AktifLeştir</Button>
+          <Button onClick={(e) => {deleteUser(record.id)}}>Dekative et</Button>
+          <Button onClick={(e) => {console.log(record.id)}}>Pasifleştir</Button>
         </Space>
       )
     }

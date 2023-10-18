@@ -1,13 +1,22 @@
 const express = require("express")
 const cors = require("cors")
 const bodyParser = require("body-parser")
-const { spawn } = require('child_process');
-const fs = require("fs")
 const db = require("./dbConnect")
 const { execFile } = require('child_process');
 const path = require('path');
-require('dotenv').config()
 const { v4: uuidv4 } = require('uuid');
+const multer = require('multer')
+const cloudinary = require('cloudinary');
+
+cloudinary.v2.config({
+  cloud_name: 'dev724mesai',
+  api_key: '963253688934656',
+  api_secret: 'ZYIePK9MFTQ3X7IGwZ5X-Cz3JnA',
+  secure: true,
+});
+
+
+require('dotenv').config()
 
 const API_KEY = process.env.API_KEY
 
@@ -532,6 +541,18 @@ app.post("/showTasks", async (req,res) =>{
     res.send(sortedData)
 })
 
+app.post("/removeUser",async(req,res) =>{
+  console.log(req.body.body)
+  const userId = req.body.body.userId
+  await db.deleteUser(userId)
+  res.send("Done")
+})
+
+app.post("/upload-img",async(req,res) =>{
+    const data = req
+    console.log("upload yav",data)
+    res.sendStatus(200)
+})
 
 app.listen(port, () => {
     console.log(`App listening on port ${port}`)
