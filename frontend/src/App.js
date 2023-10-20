@@ -5,7 +5,7 @@ import RegisterScreen from "./asset/registerScreen"
 import Panel from "./asset/adminPanel"
 import Settings from "./asset/settings"
 import {BrowserRouter, Routes, Route} from "react-router-dom";
-import Logo from "./asset/svg/altin-logo-w-1.png"
+
 
 function App() {
 

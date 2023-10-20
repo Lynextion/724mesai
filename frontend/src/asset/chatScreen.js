@@ -33,7 +33,7 @@ const ChatScreen = () =>{
         return decryptedData
     }
     
-    const [tasks,setTasks] = useState('')
+    
     const [collected,setCollected] = useState(false)
     const [messageInfo,setMessageInfo] = useState([{}])
     let [allMessage, setAllMessage] = useState([{}])
@@ -71,7 +71,7 @@ const ChatScreen = () =>{
 
              
               console.log("userInfo ", userId)
-              getTask()
+
               callTopics()
               
             } else {
@@ -179,12 +179,7 @@ const ChatScreen = () =>{
         }
     }
 
-    const getTask = async () =>{
-        const body = {
-            userId:userId
-        }
-        await axiosInstance.post("/showTasks",{body}).then((result) =>{setTasks(result.data)})
-    }
+   
 
 
     useEffect(() =>{
@@ -344,7 +339,7 @@ const ChatScreen = () =>{
                     {collected && renderTopics()}
                 </div>
                 )}
-                <UserTasks userId={tempuserId} tasks={tasks} />
+                <UserTasks userId={tempuserId} />
                 <UserScreen signOut={handleLogout.bind(this)}/>
                 
             </div>
