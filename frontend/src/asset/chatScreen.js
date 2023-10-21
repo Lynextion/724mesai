@@ -14,6 +14,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import CryptoJS from 'crypto-js'
 import UserScreen from "./userScreen"
 import UserTasks from "./userTasks"
+import * as Tabs from '@radix-ui/react-tabs';
+import Messaging from "./messagin"
 
 
 const ChatScreen = () =>{
@@ -334,14 +336,29 @@ const ChatScreen = () =>{
                 </div>
                 {showTopic && (
                 <div className="topicDiv" disabled={true}>
+                     <Tabs.Root className="TabsRoot" defaultValue="tab1">
+                <Tabs.List className="TabsList" aria-label="Manage Chat Mode">
+                    <Tabs.Trigger className="TabsTrigger" value="tab1">
+                        ChatBot
+                    </Tabs.Trigger>
+                    <Tabs.Trigger className="TabsTrigger" value="tab2">
+                        Messages
+                    </Tabs.Trigger>
+                </Tabs.List>
+                <Tabs.Content className="TabsContent" value="tab1">
                     <button className="addChat" onClick={createNewTopic}><img className="addSVG" src={Add} /><text className="topicText">Yeni mesaj</text></button>
                     <hr className="diveder"/>
                     {collected && renderTopics()}
+                    </Tabs.Content>
+                    <Tabs.Content className="TabsContent" value="tab2">
+                        <Messaging/>
+                    </Tabs.Content>
+                   </Tabs.Root>
                 </div>
                 )}
                 <UserTasks userId={tempuserId} />
                 <UserScreen signOut={handleLogout.bind(this)}/>
-                
+               
             </div>
             <div className="chat">
                 <div  ref={bottomScroll} className="messageContainer">
