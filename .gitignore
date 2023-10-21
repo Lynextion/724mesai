@@ -1,1 +1,12 @@
 middleware/testi.txt
+middleware/.firebaserc
+middleware/firebase.json
+middleware/ui-debug.log
+middleware/functions/.env
+middleware/functions/.eslintrc.js
+middleware/functions/.gitignore
+middleware/functions/index.js
+middleware/functions/package-lock.json
+middleware/functions/package.json
+middleware/functions/ui-debug.log
+middleware/public/index.html
