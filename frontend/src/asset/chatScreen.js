@@ -356,7 +356,8 @@ const ChatScreen = () =>{
                    </Tabs.Root>
                 </div>
                 )}
-                <UserTasks userId={tempuserId} />
+                <UserTasks userId={tempuserId} tasks={tasks} />
+                <hr className="diveder"/>
                 <UserScreen signOut={handleLogout.bind(this)}/>
                
             </div>
