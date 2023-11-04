@@ -5,8 +5,13 @@ const db = require("./dbConnect")
 const { execFile } = require('child_process');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
-const multer = require('multer')
 const cloudinary = require('cloudinary');
+const mongoose = require("mongoose")
+const socketIO = require("socket.io")
+const WebSocket = require("ws")
+const http= require("http")
+
+const Message = require("./messages.json")
 
 cloudinary.v2.config({
   cloud_name: 'dev724mesai',
@@ -16,12 +21,16 @@ cloudinary.v2.config({
 });
 
 
+
 require('dotenv').config()
 
 const API_KEY = process.env.API_KEY
 
 const app = express()
 const port = 4000
+const server = http.createServer(app)
+const io = socketIO(server)
+const wss = new WebSocket.Server({noServer:true})
 
 const allowedOrigins = ["http://localhost:3000"]
 
@@ -47,6 +56,26 @@ const validateApiKey = (req, res, next) => {
 };
 
 // Apply the API key validation middleware to all routes
+
+wss.on('connection',(ws) =>{
+  console.log("WebSocket connection established");
+
+  ws.on('message',(message) =>{
+    console.log("Received WebSocket message:",message);
+  })
+
+})
+
+server.on('upgrade',(request,socket,head) =>{
+  wss.handleUpgrade(request,socket,head,(ws) =>{
+    wss.emit('conection',ws,request);
+  })
+})
+
+mongoose.connect("mongodb+srv://ataozdamar:0lORT0N1yu85fQfF@message.wbvaqbz.mongodb.net/?retryWrites=true&w=majority",{
+  useNewUrlParser:true,
+  useUnifiedTopology:true,
+});
 
 app.use(cors(corsOptions))
 app.options('*',cors(corsOptions))

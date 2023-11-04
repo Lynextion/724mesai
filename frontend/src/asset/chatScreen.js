@@ -14,6 +14,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import CryptoJS from 'crypto-js'
 import UserScreen from "./userScreen"
 import UserTasks from "./userTasks"
+import * as Tabs from '@radix-ui/react-tabs';
+import Messaging from "./messagin"
 
 
 const ChatScreen = () =>{
@@ -33,7 +35,7 @@ const ChatScreen = () =>{
         return decryptedData
     }
     
-    const [tasks,setTasks] = useState('')
+    
     const [collected,setCollected] = useState(false)
     const [messageInfo,setMessageInfo] = useState([{}])
     let [allMessage, setAllMessage] = useState([{}])
@@ -51,6 +53,7 @@ const ChatScreen = () =>{
     const userInfo = tempInfo[0]
     const tempuserId = userInfo.id
     const [userId,setUserId] = useState(tempuserId)
+    const [messageMode,setMessageMode] = useState("ai")
    
 
     const navigate = useNavigate()
@@ -71,7 +74,7 @@ const ChatScreen = () =>{
 
              
               console.log("userInfo ", userId)
-              getTask()
+
               callTopics()
               
             } else {
@@ -179,12 +182,7 @@ const ChatScreen = () =>{
         }
     }
 
-    const getTask = async () =>{
-        const body = {
-            userId:userId
-        }
-        await axiosInstance.post("/showTasks",{body}).then((result) =>{setTasks(result.data)})
-    }
+   
 
 
     useEffect(() =>{
@@ -227,53 +225,55 @@ const ChatScreen = () =>{
 
     const sentMessage = async ()  =>{
         
+        if(messageMode === "ai"){
+        
+            if(setActivate){
+                const tempMessageId = currentMessageId
+                if(newMessage === false){
+                    setActivate(false)
+                    setDisabled(true)
+                    const body = {
+                        "userId": userId,
+                        "messageId":tempMessageId,
+                        "message":{"role":"user","content":send}
+                    }
+                    setSend('')
+                    console.log("body",body)
+                    tempUpdateMessage(body.message,tempMessageId)
+                    bottomScroll.current.scrollIntoView({behavior:'smooth'})
 
-        if(setActivate){
-            const tempMessageId = currentMessageId
-            if(newMessage === false){
-                setActivate(false)
-                setDisabled(true)
-                const body = {
-                    "userId": userId,
-                    "messageId":tempMessageId,
-                    "message":{"role":"user","content":send}
+                    await axiosInstance.post("/message",{body}).then((response) => {
+                        tempUpdateMessage(response.data,tempMessageId)
+                    }).then(() => setActivate(true)).then(() => setDisabled(false))
+                    bottomScroll.current.scrollIntoView({behavior:'smooth'})
                 }
-                setSend('')
-                console.log("body",body)
-                tempUpdateMessage(body.message,tempMessageId)
-                bottomScroll.current.scrollIntoView({behavior:'smooth'})
 
-                await axiosInstance.post("/message",{body}).then((response) => {
-                    tempUpdateMessage(response.data,tempMessageId)
-                }).then(() => setActivate(true)).then(() => setDisabled(false))
-                bottomScroll.current.scrollIntoView({behavior:'smooth'})
-            }
+                else{
 
-            else{
+                    setActivate(false)
+                    setDisabled(true)
+                    setDisabled('')
+                    console.log("191 ",userId)
+                    const body = {
+                        "userId": userId,
+                        "message":{"role":"user","content":send}
+                    }
+                    console.log("body",body)
+                    updateMessage(body.message)
+                    bottomScroll.current.scrollIntoView({behavior:'smooth'})
 
-                setActivate(false)
-                setDisabled(true)
-                setDisabled('')
-                console.log("191 ",userId)
-                const body = {
-                    "userId": userId,
-                    "message":{"role":"user","content":send}
+                    await axiosInstance.post("/create-message",{body}).then((response) => {
+                        updateMessage(JSON.parse(response.data.result))
+                        console.log("response result",response.data.result)
+                        setCurrentMessageId(response.data.messageId)
+                    }).then(() => setActivate(true)).then(() => setDisabled(false))
+                    callTopics()
+                    setNewMessage(false)
+                    bottomScroll.current.scrollIntoView({behavior:'smooth'})
                 }
-                console.log("body",body)
-                updateMessage(body.message)
-                bottomScroll.current.scrollIntoView({behavior:'smooth'})
 
-                await axiosInstance.post("/create-message",{body}).then((response) => {
-                    updateMessage(JSON.parse(response.data.result))
-                    console.log("response result",response.data.result)
-                    setCurrentMessageId(response.data.messageId)
-                }).then(() => setActivate(true)).then(() => setDisabled(false))
-                callTopics()
-                setNewMessage(false)
-                bottomScroll.current.scrollIntoView({behavior:'smooth'})
-            }
-
-    }
+    }   
+        }
 
     }
 
@@ -339,15 +339,30 @@ const ChatScreen = () =>{
                 </div>
                 {showTopic && (
                 <div className="topicDiv" disabled={true}>
+                     <Tabs.Root className="TabsRoot" defaultValue="tab1">
+                <Tabs.List className="TabsList" aria-label="Manage Chat Mode">
+                    <Tabs.Trigger className="TabsTrigger" value="tab1" >
+                        ChatBot
+                    </Tabs.Trigger>
+                    <Tabs.Trigger className="TabsTrigger" value="tab2" >
+                        Messages
+                    </Tabs.Trigger>
+                </Tabs.List>
+                <Tabs.Content className="TabsContent" value="tab1">
                     <button className="addChat" onClick={createNewTopic}><img className="addSVG" src={Add} /><text className="topicText">Yeni mesaj</text></button>
                     <hr className="diveder"/>
                     {collected && renderTopics()}
+                    </Tabs.Content>
+                    <Tabs.Content className="TabsContent" value="tab2">
+                        <Messaging/>
+                    </Tabs.Content>
+                   </Tabs.Root>
                 </div>
                 )}
-                <UserTasks userId={tempuserId} tasks={tasks} />
+                <UserTasks userId={tempuserId}  />
                 <hr className="diveder"/>
                 <UserScreen signOut={handleLogout.bind(this)}/>
-                
+               
             </div>
             <div className="chat">
                 <div  ref={bottomScroll} className="messageContainer">

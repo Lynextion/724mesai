@@ -1,12 +1,28 @@
 import "./chatScreen.css"
 import {Collapse, ConfigProvider} from "antd"
 import { useEffect, useState } from "react";
+import axios from "axios"
 
 
-const UserTasks = ({tasks}) =>{
+const axiosInstance = axios.create({
+    baseURL:"http://localhost:4000",
+    headers: {
+        'Content-Type': 'application/json',
+        'X-API-Key': "7aad182c-0877-4952-927a-baed5451fd84",
+      },
+})
+
+const UserTasks = ({userId}) =>{
     
-    const task = [...tasks]
+    const [task,setTask] = useState([])
     
+    const getTask = async () =>{
+        const body = {
+            userId:userId
+        }
+        await axiosInstance.post("/showTasks",{body}).then((result) =>{setTask(result.data)})
+    }
+
     const items= [
       {
         key: '1',
@@ -21,10 +37,11 @@ const UserTasks = ({tasks}) =>{
         })
       },
 
+
     ];
 
     useEffect(() => {
-        console.log(tasks)
+        getTask()
     },[])
 
     return(
